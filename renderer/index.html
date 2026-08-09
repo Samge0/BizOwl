@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' blob: https:; style-src 'self' 'unsafe-inline' http: https:; img-src 'self' data: blob: http: https:; font-src 'self' data: blob: http: https:; media-src 'self' data: blob: http: https:; connect-src 'self' data: blob: http: https: ws: wss:; worker-src 'self' blob:" />
+    <title>BizOwl</title>
+    <link rel="stylesheet" href="styles.css">
+    <!-- Mermaid.js 动态加载（在 main.js 中按需加载，避免 jsdom 测试环境卡死） -->
+  </head>
+  <body>
+    <div class="app-container">
+      <!-- 标题栏 -->
+      <div class="titlebar">
+        <span class="titlebar-title">BizOwl</span>
+        <div class="titlebar-spacer"></div>
+        <div class="titlebar-controls">
+          <button class="titlebar-btn btn-minimize" id="btnMinimize" title="最小化"></button>
+          <button class="titlebar-btn btn-maximize" id="btnMaximize" title="最大化"></button>
+          <button class="titlebar-btn btn-close" id="btnClose" title="关闭"></button>
+        </div>
+      </div>
+
+      <!-- 主内容 -->
+      <div class="main-content" style="position: relative;">
+        <!-- 左侧栏 -->
+        <aside class="sidebar" id="sidebar">
+          <!-- 导航按钮区 -->
+          <div class="sidebar-nav">
+            <button class="sidebar-nav-btn" id="navNewChat" title="新对话">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            </button>
+            <button class="sidebar-nav-btn" id="navSearch" title="搜索历史">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            </button>
+            <button class="sidebar-nav-btn" id="navSkills" title="技能列表">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+            </button>
+          </div>
+
+          <!-- 会话历史区 -->
+          <div class="sidebar-section flex-fill" id="historySection">
+            <div class="session-search" id="sessionSearchBox" style="display:none;">
+              <span class="session-search-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span>
+              <input type="text" id="sessionSearchInput" placeholder="搜索对话内容..." />
+              <button id="sessionSearchClose" title="关闭搜索"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+            </div>
+            <div class="sidebar-section-title">
+              <span>历史</span>
+            </div>
+            <div class="sidebar-section-list" id="historyList">
+              <div class="history-empty">暂无会话</div>
+            </div>
+          </div>
+
+          <!-- 底部栏：设置齿轮 + 版本号 + GitHub -->
+          <div class="sidebar-footer-v2">
+            <button class="icon-btn" id="openSettingsBtn" title="设置">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+            </button>
+            <a class="sidebar-version" id="githubLink" title="在 GitHub 上查看" style="display:flex;align-items:center;gap:5px;cursor:pointer;text-decoration:none;color:var(--ink);transition:opacity 0.1s;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+              <span>BizOwl v…</span>
+              <span class="update-dot" id="updateDot" title="发现新版本，点击下载" style="display:none;"></span>
+            </a>
+          </div>
+        </aside>
+
+        <!-- 技能浮层 -->
+        <div class="skills-popover" id="skillsPopover">
+          <div class="skills-popover-header">
+            <h4>技能列表</h4>
+            <div style="display:flex; gap:4px;">
+              <button class="icon-btn" id="importSkillBtn" title="导入技能"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button>
+              <button class="icon-btn" id="closeSkillsPopover" title="关闭"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+            </div>
+          </div>
+          <div class="skills-popover-list" id="skillsList">
+            <div class="empty-state">加载中...</div>
+          </div>
+        </div>
+
+        <!-- 中间聊天区 -->
+        <main class="chat-area">
+          <div class="chat-header">
+            <div class="chat-header-left">
+              <div class="agent-badge">
+                <img src="../assets/welcome-logo.png" alt="" style="width:24px;height:24px;" />
+                <span id="headerAgentName">BizOwl</span>
+              </div>
+            </div>
+            <div class="chat-header-actions">
+              <!-- Token 用量统计（参考 Hermes Web UI） -->
+              <div class="token-stats" id="tokenStats" title="本会话 Token 消耗">
+                <span class="token-stats-label">Tokens</span>
+                <span class="token-stats-value" id="tokenStatsValue">0</span>
+                <span class="token-stats-limit" id="tokenStatsLimit"></span>
+              </div>
+              <div class="model-selector">
+                <select id="modelSelect" title="选择模型">
+                  <option value="-1">— 选择模型 —</option>
+                </select>
+              </div>
+              <button class="icon-btn" id="toggleSettings" title="设置">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+              </button>
+            </div>
+          </div>
+          <div class="chat-messages" id="chatMessages">
+            <!-- 欢迎页 -->
+            <div class="welcome" id="welcomePage">
+              <div class="welcome-logo"><img src="../assets/welcome-logo.png" alt="BizOwl" style="width:96px;height:96px;" /></div>
+              <h1>BizOwl</h1>
+              <p>直接输入你的问题，或选择下方场景开始</p>
+
+              <div class="section-label">快捷场景</div>
+              <div class="quick-actions" id="quickActions">
+                <div class="empty-state">加载中...</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 持久生成状态条：当前会话生成中时显示（独立于流式 live view，不会被工具调用/会话切换打断隐藏） -->
+          <div class="chat-generating-bar" id="chatGeneratingBar">
+            <span class="gen-pulse"></span>
+            <span class="gen-label">正在思考…</span>
+          </div>
+
+          <div class="chat-input-area">
+            <!-- 附件预览区 -->
+            <div class="attachment-preview" id="attachmentPreview"></div>
+
+            <!-- @企业候选下拉 -->
+            <div class="mention-dropdown" id="mentionDropdown"></div>
+
+            <!-- @企业搜索弹窗已移至 body 直接子级，避免 backdrop-filter 父级破坏 position:fixed -->
+
+            <div class="chat-input-wrapper">
+              <!-- 附件按钮 -->
+              <button class="input-icon-btn" id="attachBtn" title="上传文件">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+              </button>
+              <!-- @企业按钮 -->
+              <button class="input-icon-btn" id="mentionBtn" title="@ 引用企业">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M16 8v5a3 3 0 0 0 6 0v-1a10 10 0 1 0-4 8"/></svg>
+              </button>
+              <input type="file" id="fileInput" multiple style="display:none" />
+
+              <textarea
+                class="chat-input"
+                id="chatInput"
+                placeholder="输入消息，Enter 发送，Shift+Enter 换行..."
+                rows="1"
+              ></textarea>
+
+              <!-- 发送/停止按钮 -->
+              <button class="send-btn" id="sendBtn" title="发送">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+              </button>
+              <button class="stop-btn" id="stopBtn" title="停止生成" style="display:none;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="6" width="12" height="12" rx="2"/></svg>
+              </button>
+            </div>
+          </div>
+        </main>
+
+      </div>
+    </div>
+
+    <!-- 设置面板遮罩 — body 直接子级，确保覆盖 titlebar 和所有按钮 -->
+    <div class="settings-overlay" id="settingsOverlay"></div>
+
+    <!-- 设置面板 — body 直接子级，macOS 系统设置风格（左导航 + 右内容） -->
+    <aside class="settings-panel" id="settingsPanel">
+          <div class="settings-header">
+            <h3>设置</h3>
+            <button class="icon-btn" id="closeSettings" title="关闭"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+          </div>
+          <div class="settings-content">
+            <!-- 左导航栏 -->
+            <nav class="settings-nav" id="settingsNav">
+              <button class="settings-nav-item active" data-tab="account" title="账号凭证">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                <span>账号凭证</span>
+              </button>
+              <button class="settings-nav-item" data-tab="models" title="自定义模型">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+                <span>自定义模型</span>
+              </button>
+              <button class="settings-nav-item" data-tab="search" title="外部搜索源">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                <span>外部搜索源</span>
+              </button>
+              <button class="settings-nav-item" data-tab="memory" title="记忆与人设">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>
+                <span>记忆与人设</span>
+              </button>
+              <button class="settings-nav-item" data-tab="advanced" title="超时配置">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                <span>超时配置</span>
+              </button>
+            </nav>
+            <!-- 右内容区 -->
+            <div class="settings-body" id="settingsBody">
+              <!-- 凭证 / 登录 -->
+              <div class="settings-section active" data-tab="account">
+                <div class="settings-section-title">账号凭证</div>
+                <div id="authArea">
+                  <div class="empty-state">加载中...</div>
+                </div>
+              </div>
+
+              <!-- 模型配置 -->
+              <div class="settings-section" data-tab="models">
+                <div class="settings-section-title">自定义模型</div>
+                <div class="info-banner">
+                  请填写兼容 OpenAI 格式的 API 信息。
+                </div>
+                <div id="modelList">
+                  <div class="empty-state">加载中...</div>
+                </div>
+                <button class="add-model-btn" id="addModelBtn" style="margin-top: 8px;">+ 添加模型</button>
+              </div>
+
+              <!-- 外部搜索源配置 -->
+              <div class="settings-section" data-tab="search">
+                <div class="settings-section-title">外部搜索源</div>
+                <div class="info-banner">
+                  可选接入第三方搜索 API，与内置多引擎搜索并行调用、自动合并结果。配置后请打开开关启用。
+                </div>
+                <div id="externalSearchArea">
+                  <!-- Tavily -->
+                  <div class="ext-source-row">
+                    <div class="ext-source-header">
+                      <label class="ext-source-toggle">
+                        <input type="checkbox" id="tavilyEnabled" />
+                        <span class="ext-source-name">Tavily</span>
+                      </label>
+                      <span class="ext-source-desc">AI优化搜索 · 免费1000次/月</span>
+                    </div>
+                    <input type="password" id="tavilyApiKey" class="ext-source-input" placeholder="tvly-xxxxx..." autocomplete="off" />
+                    <a href="https://tavily.com" target="_blank" class="ext-source-link">获取 API Key →</a>
+                  </div>
+                  <!-- Serper.dev -->
+                  <div class="ext-source-row">
+                    <div class="ext-source-header">
+                      <label class="ext-source-toggle">
+                        <input type="checkbox" id="serperEnabled" />
+                        <span class="ext-source-name">Serper.dev</span>
+                      </label>
+                      <span class="ext-source-desc">Google搜索API · 免费2500次</span>
+                    </div>
+                    <input type="password" id="serperApiKey" class="ext-source-input" placeholder="xxxxx..." autocomplete="off" />
+                    <a href="https://serper.dev" target="_blank" class="ext-source-link">获取 API Key →</a>
+                  </div>
+                  <!-- SearXNG -->
+                  <div class="ext-source-row">
+                    <div class="ext-source-header">
+                      <label class="ext-source-toggle">
+                        <input type="checkbox" id="searxngEnabled" />
+                        <span class="ext-source-name">SearXNG</span>
+                      </label>
+                      <span class="ext-source-desc">自建元搜索 · 免费无限次</span>
+                    </div>
+                    <input type="text" id="searxngUrl" class="ext-source-input" placeholder="http://localhost:8080" autocomplete="off" />
+                    <a href="https://searxng.org" target="_blank" class="ext-source-link">部署指南 →</a>
+                  </div>
+                  <button class="memory-save-btn" id="saveExternalSearchBtn" style="margin-top: 8px;">保存配置</button>
+                </div>
+              </div>
+
+              <!-- 高级 · 超时配置 -->
+              <div class="settings-section" data-tab="advanced">
+                <div class="settings-section-title">超时配置</div>
+                <div class="info-banner">
+                  LLM 流式响应的超时阈值（单位：秒）。研究类任务（含"研究报告/尽调/分析"等关键词）自动套用更长超时，避免长报告生成被拦腰切断。改完点保存，下次提问生效。
+                </div>
+                <div class="ext-source-row">
+                  <div class="ext-source-header">
+                    <span class="ext-source-name">普通对话 · 首字节等待</span>
+                    <span class="ext-source-desc">秒</span>
+                  </div>
+                  <input type="number" id="timeoutFirstByteNormal" class="ext-source-input" min="5" step="1" style="max-width: 160px;" />
+                </div>
+                <div class="ext-source-row">
+                  <div class="ext-source-header">
+                    <span class="ext-source-name">研究类任务 · 首字节等待</span>
+                    <span class="ext-source-desc">秒</span>
+                  </div>
+                  <input type="number" id="timeoutFirstByteResearch" class="ext-source-input" min="5" step="1" style="max-width: 160px;" />
+                </div>
+                <div class="ext-source-row">
+                  <div class="ext-source-header">
+                    <span class="ext-source-name">普通对话 · 流传输空闲超时</span>
+                    <span class="ext-source-desc">秒</span>
+                  </div>
+                  <input type="number" id="timeoutStreamIdleNormal" class="ext-source-input" min="5" step="1" style="max-width: 160px;" />
+                </div>
+                <div class="ext-source-row">
+                  <div class="ext-source-header">
+                    <span class="ext-source-name">研究类任务 · 流传输空闲超时</span>
+                    <span class="ext-source-desc">秒</span>
+                  </div>
+                  <input type="number" id="timeoutStreamIdleResearch" class="ext-source-input" min="5" step="1" style="max-width: 160px;" />
+                </div>
+                <div style="margin-top: 8px;">
+                  <button class="memory-save-btn" id="saveTimeoutBtn">保存配置</button>
+                  <button class="memory-save-btn" id="resetTimeoutBtn" style="margin-left: 8px; background: #64748b;">恢复默认</button>
+                </div>
+              </div>
+
+              <!-- 记忆管理 -->
+              <div class="settings-section" data-tab="memory">
+                <div class="settings-section-title">记忆与人设</div>
+                <div class="info-banner">
+                  BizOwl 会在对话中自动学习并记住你的偏好。你也可以手动编辑。
+                </div>
+                <div id="memoryArea">
+                  <div class="memory-tabs">
+                    <button class="memory-tab active" data-mtab="profile">用户画像</button>
+                    <button class="memory-tab" data-mtab="log">记忆日志</button>
+                  </div>
+                  <div class="memory-panel" id="mtab-profile">
+                    <textarea id="userMdEditor" class="memory-editor" placeholder="用户画像（USER.md）..."></textarea>
+                    <button class="memory-save-btn" id="saveUserMdBtn">保存画像</button>
+                  </div>
+                  <div class="memory-panel" id="mtab-log" style="display:none;">
+                    <div class="memory-stats" id="memoryStats">加载中...</div>
+                    <input type="text" id="memoryFilterInput" class="memory-filter-input" placeholder="搜索过滤记忆..." autocomplete="off" />
+                    <div class="memory-log-toolbar" id="memoryLogToolbar">
+                      <label class="memory-check-all">
+                        <input type="checkbox" id="memorySelectAll">
+                        <span>全选</span>
+                      </label>
+                      <span class="memory-selected-count" id="memorySelectedCount"></span>
+                      <button class="memory-delete-btn" id="memoryDeleteBtn" disabled>删除选中</button>
+                    </div>
+                    <div class="memory-log-list" id="memoryLogList"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </aside>
+
+    <!-- @引用企业弹窗 — body 直接子级，确保 position:fixed 不被 backdrop-filter 破坏 -->
+    <div class="company-modal-overlay" id="companyModalOverlay" style="display:none;">
+      <div class="company-modal" id="companyModal">
+        <div class="company-modal-header">
+          <span>@ 引用企业</span>
+          <button class="icon-btn" id="companyModalClose" title="关闭"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+        </div>
+        <input type="text" id="companySearchInput" class="company-modal-input" placeholder="输入公司名称搜索..." autocomplete="off" />
+        <div class="company-modal-results" id="companyModalResults">
+          <div class="company-modal-hint">💡 输入公司名搜索并引用企业</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 图片大图预览（lightbox）— body 直接子级，确保 position:fixed 相对视口 -->
+    <!-- 滚动导航：body 直接子级（避免 chat-area 的 backdrop-filter 创建 containing block 破坏 fixed） -->
+    <div class="scroll-nav-fab" id="scrollNavFab">
+      <button class="scroll-nav-btn" id="scrollToTopBtn" title="回到顶部">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg>
+      </button>
+      <button class="scroll-nav-btn" id="scrollToBottomBtn" title="回到底部">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+      </button>
+    </div>
+
+    <!-- 右侧用户消息快速导航：body 直接子级 -->
+    <div class="msg-rail" id="msgRail">
+      <div class="msg-rail-panel" id="msgRailPanel">
+        <div class="msg-rail-header">用户消息</div>
+        <div class="msg-rail-list" id="msgRailList"></div>
+      </div>
+      <div class="msg-rail-tab" id="msgRailTab" title="用户消息导航">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="14" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+      </div>
+    </div>
+
+    <div class="img-lightbox" id="imgLightbox" style="display:none;">
+      <div class="img-lightbox-stage" id="imgLightboxStage">
+        <img class="img-lightbox-img" id="imgLightboxImg" alt="" />
+      </div>
+      <button class="img-lightbox-close" id="imgLightboxClose" title="关闭 (Esc)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+      <div class="img-lightbox-toolbar">
+        <button class="img-lightbox-tool" id="imgZoomOut" title="缩小"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
+        <span class="img-lightbox-zoom-label" id="imgZoomLabel">100%</span>
+        <button class="img-lightbox-tool" id="imgZoomIn" title="放大"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
+        <button class="img-lightbox-tool" id="imgZoomReset" title="重置"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg></button>
+      </div>
+    </div>
+
+    <!-- 调试面板 -->
+    <div class="debug-panel" id="debugPanel">
+      <div class="debug-panel-toolbar">
+        <span>Debug Console</span>
+        <button class="debug-export-btn" id="debugExportBtn" title="导出日志文件">📥 导出日志</button>
+        <button class="debug-clear-btn" id="debugClearBtn" title="清空">清空</button>
+      </div>
+      <pre id="debugContent"></pre>
+    </div>
+
+    <!-- 深度研究报告弹窗 — body 直接子级（规避 backdrop-filter containing block） -->
+    <div class="report-modal-overlay" id="reportModalOverlay" style="display:none;">
+      <div class="report-modal" id="reportModal" role="dialog" aria-modal="true">
+        <div class="report-modal-header">
+          <span class="report-modal-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+          </span>
+          <div class="report-modal-title-wrap">
+            <h3>深度研究报告</h3>
+            <p class="report-modal-sub">基于本次会话内容进行多源深度研究，输出一份专业的 PDF 报告</p>
+          </div>
+          <button class="icon-btn" id="reportModalClose" title="关闭">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+        <div class="report-modal-body">
+          <label class="report-modal-label" for="reportDirectionInput">方向指导（可选）</label>
+          <textarea id="reportDirectionInput" class="report-direction-input" placeholder="例如：重点关注市场规模与竞争格局；目标读者是投资人；篇幅 10 页左右；额外关注政策风险..."></textarea>
+          <div class="report-modal-hint">留空则按默认维度（市场规模 / 竞争格局 / 技术成熟度 / 政策与风险 / 趋势）全面分析</div>
+        </div>
+        <div class="report-modal-footer">
+          <button class="report-modal-btn report-modal-btn-cancel" id="reportModalCancel">取消</button>
+          <button class="report-modal-btn report-modal-btn-confirm" id="reportModalConfirm">开始生成报告</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 通用确认弹窗（替代原生 confirm，使用应用图标） -->
+    <div class="confirm-dialog-overlay" id="confirmDialogOverlay" style="display:none;">
+      <div class="confirm-dialog" role="dialog" aria-modal="true" aria-labelledby="confirmDialogTitle">
+        <img class="confirm-dialog-icon" src="../assets/icon.png" alt="BizOwl" />
+        <div class="confirm-dialog-title" id="confirmDialogTitle">确认操作</div>
+        <div class="confirm-dialog-message" id="confirmDialogMessage"></div>
+        <div class="confirm-dialog-footer">
+          <button class="confirm-dialog-btn confirm-dialog-btn-cancel" id="confirmDialogCancel">取消</button>
+          <button class="confirm-dialog-btn confirm-dialog-btn-confirm" id="confirmDialogConfirm">确定</button>
+        </div>
+      </div>
+    </div>
+
+    <script src="js/confirm-dialog.js"></script>
+    <script src="js/core.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/markdown.js"></script>
+    <script src="js/messages.js"></script>
+    <script src="js/sessions.js"></script>
+    <script src="js/settings.js"></script>
+    <script src="js/presets.js"></script>
+    <script src="js/attachments.js"></script>
+    <script src="js/mention.js"></script>
+    <script src="js/report-modal.js"></script>
+    <script src="js/chat.js"></script>
+    <script src="js/main.js"></script>
+  </body>
+</html>

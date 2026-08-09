@@ -1,0 +1,11 @@
+{
+  "name": "Wind 金融",
+  "name_en": "Wind Financial",
+  "description": "用于查询万得股票、债券、基金、指数、宏观经济、金融文档和金融数据计算等金融数据服务。",
+  "description_zh": "用于查询万得股票、债券、基金、指数、宏观经济、金融文档和金融数据计算等金融数据服务。",
+  "description_en": "Query Wind financial data services including stocks, bonds, funds, indexes, macroeconomic data, financial documents, and financial data analytics.",
+  "source": "wind",
+  "type": "mcp",
+  "auth_mode": "apiKey",
+  "version": "1.0.0"
+}

@@ -1,0 +1,11 @@
+{
+  "name": "北大法宝",
+  "name_en": "Pkulaw",
+  "description": "用于北大法宝法律法规检索、法规条文详情获取和司法案例检索等法律数据服务。",
+  "description_zh": "用于北大法宝法律法规检索、法规条文详情获取和司法案例检索等法律数据服务。",
+  "description_en": "Search Pkulaw statutes and regulations, retrieve article details, and search judicial cases through legal data services.",
+  "source": "pkulaw",
+  "type": "mcp",
+  "auth_mode": "apiKey",
+  "version": "1.0.0"
+}

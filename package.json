@@ -1,0 +1,79 @@
+{
+  "name": "BizOwl",
+  "version": "1.0.0",
+  "description": "BizOwl - 轻量级 AI 商业助手桌面应用",
+  "main": "electron/main.cjs",
+  "desktopName": "BizOwl",
+  "author": {
+    "name": "Samge",
+    "email": "samge@users.noreply.github.com"
+  },
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron . --dev",
+    "build": "electron-builder",
+    "build:mac": "electron-builder --mac",
+    "build:win": "electron-builder --win",
+    "build:linux": "electron-builder --linux",
+    "test:renderer": "node scripts/harness-renderer.cjs"
+  },
+  "dependencies": {
+    "js-yaml": "^4.3.0",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "electron": "^43.3.0",
+    "electron-builder": "^26.15.3",
+    "jsdom": "^30.0.1"
+  },
+  "build": {
+    "appId": "com.bizowl.app",
+    "productName": "BizOwl",
+    "icon": "assets/icon.png",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "electron/**/*",
+      "src/**/*",
+      "skills/**/*",
+      "renderer/**/*",
+      "assets/**/*",
+      "package.json"
+    ],
+    "asarUnpack": [
+      "skills/builtin/**/*"
+    ],
+    "mac": {
+      "category": "public.app-category.developer-tools",
+      "target": [
+        "dmg",
+        "zip"
+      ]
+    },
+    "win": {
+      "target": [
+        "nsis",
+        "portable"
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "allowElevation": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "perMachine": false
+    },
+    "linux": {
+      "maintainer": "Samge <samge@users.noreply.github.com>",
+      "syncDesktopName": true,
+      "target": [
+        "AppImage",
+        "deb"
+      ]
+    }
+  }
+}

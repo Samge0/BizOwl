@@ -1,0 +1,51 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+out/
+
+# OS files
+.DS_Store
+.DS_Store?
+._*
+Thumbs.db
+
+# IDE / Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Logs
+*.log
+logs/
+
+# Cache
+.cache/
+.claude/
+.codex/
+__pycache__/
+*.pyc
+
+# Runtime data
+*.pid
+*.seed
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Skill runtime artifacts
+skills/builtin/browser-use/.launcher.log
+skills/builtin/browser-use/.server.log
+skills/builtin/web-search/.connection
+# web-search 的 dist/ 是预编译产物，需随仓库分发（打包后 bridge server 依赖它）
+!skills/builtin/web-search/dist/
+!skills/builtin/web-search/dist/**
+
+# Temporary files
+temp-*
+/tmp/

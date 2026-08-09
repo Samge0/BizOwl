@@ -1,0 +1,11 @@
+{
+  "name": "同花顺 iFinD",
+  "name_en": "iFinD",
+  "description": "用于查询同花顺 iFinD 股票、基金、EDB 宏观指标、财经资讯、债券、全球股票和指数等金融数据。",
+  "description_zh": "用于查询同花顺 iFinD 股票、基金、EDB 宏观指标、财经资讯、债券、全球股票和指数等金融数据。",
+  "description_en": "Query iFinD financial data including stocks, funds, EDB macro indicators, financial news, bonds, global stocks, and indexes.",
+  "source": "ifind",
+  "type": "mcp",
+  "auth_mode": "apiKey",
+  "version": "1.0.0"
+}

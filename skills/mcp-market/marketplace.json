@@ -1,0 +1,355 @@
+{
+    "items": [
+        {
+            "id": 1000,
+            "name": "dingtalk-doc",
+            "displayName": "钉钉文档",
+            "description": "用于钉钉文档搜索、创建、读取和编辑，支持知识库节点、文件夹、权限、附件及文档导出管理。",
+            "category": "工具",
+            "min_app_version": "1.0.8",
+            "skill_package_url": "https://up.qcc.com/manage/7f730b9b-a517-478d-8e70-209db6a9bb95/dingtalk-doc.zip",
+            "auth": {
+                "type": "apiKey",
+                "target": "query",
+                "key": "key",
+                "helpUrl": "https://aihub.dingtalk.com/#/detail?mcpId=9629&detailType=marketMcpDetail",
+                "label": "钉钉 MCP Key",
+                "placeholder": "请输入钉钉 MCP Key",
+                "description": "钉钉 MCP 网关通过 URL query 参数 key 认证。",
+                "helpText": "保存后会以 ?key=<输入值> 的形式追加到钉钉 MCP Server 地址。",
+                "helpLinkText": "如何获取钉钉 MCP Key?"
+            },
+            "servers": [
+                {
+                    "id": 1001,
+                    "name": "dingtalk-doc",
+                    "description": "用于钉钉文档搜索、创建、读取和编辑，支持知识库节点、文件夹、权限、附件及文档导出管理。",
+                    "transport_type": "streamable_http",
+                    "required_headers": "[]",
+                    "url": "https://mcp-gw.dingtalk.com/server/22f4a2937baa32a3c33a8d2714c121ffde1459ebc0179b0a3c142ca92701b5a6"
+                }
+            ]
+        },
+        {
+            "id": 7000,
+            "name": "wps",
+            "displayName": "WPS文档",
+            "description": "WPS 开放平台基于WPS 365 开放API的能力兼容MCP协议，陆续完成适配接入，支持企业以通用化的方式在智能体中调用365 API，满足企业AI业务开发需求。",
+            "category": "工具",
+            "min_app_version": "",
+            "skill_package_url": "",
+            "auth": {
+                "type": "apiKey",
+                "target": "header",
+                "key": "Authorization",
+                "valuePrefix": "Bearer ",
+                "helpUrl": "https://www.kdocs.cn/latest",
+                "label": "WPS Access Token",
+                "placeholder": "请输入 WPS Access Token",
+                "description": "WPS MCP 服务通过 Authorization: Bearer <access_token> 请求头认证。",
+                "helpText": "从 WPS 开放平台获取 access_token 后填入。",
+                "helpLinkText": "如何获取 WPS Access Token?"
+            },
+            "servers": [
+                {
+                    "id": 24,
+                    "name": "wps",
+                    "description": "",
+                    "transport_type": "streamable_http",
+                    "required_headers": "[]",
+                    "url": "https://mcp-center.wps.cn/skill_hub/mcp"
+                }
+            ]
+        },
+        {
+            "id": 2000,
+            "name": "qveris",
+            "displayName": "QVeris",
+            "description": "通过 discover、inspect、call 发现并调用第三方数据、API 和工具，覆盖量化行情、宏观固收、投研、风险合规等金融 agent 场景。",
+            "category": "金融",
+            "min_app_version": "",
+            "skill_package_url": "https://up.qcc.com/manage/e49ac281-af85-4dbd-a105-bc9a5a115fd0/qveris.zip",
+            "auth": {
+                "type": "apiKey",
+                "target": "env",
+                "key": "QVERIS_API_KEY",
+                "helpUrl": "https://qveris.ai/docs/mcp-server",
+                "label": "QVeris API Key",
+                "placeholder": "请输入 QVeris API Key",
+                "description": "QVeris stdio MCP server 通过 QVERIS_API_KEY 环境变量读取 API Key。",
+                "helpText": "在 QVeris 控制台或账号页面获取 API Key 后填入。",
+                "helpLinkText": "如何获取 QVeris API Key?"
+            },
+            "servers": [
+                {
+                    "id": 2001,
+                    "name": "qveris-mcp",
+                    "description": "通过 discover、inspect、call 发现并调用第三方数据、API 和工具，覆盖量化行情、宏观固收、投研、风险合规等金融 agent 场景。",
+                    "transport_type": "stdio",
+                    "command": "node",
+                    "args": "[\"dist-electron/main/qverisMcpProxy.js\"]",
+                    "required_headers": "[]"
+                }
+            ]
+        },
+        {
+            "id": 3000,
+            "name": "ifind",
+            "displayName": "同花顺 iFinD",
+            "description": "用于查询同花顺 iFinD 股票、基金、EDB 宏观指标、财经资讯、债券、全球股票和指数等金融数据。",
+            "category": "金融",
+            "min_app_version": "",
+            "skill_package_url": "https://up.qcc.com/manage/a5778465-9118-4f4c-8914-7b52b95b08f8/ifind.zip",
+            "auth": {
+                "type": "apiKey",
+                "target": "header",
+                "key": "Authorization",
+                "helpUrl": "https://mcp.51ifind.com/",
+                "label": "Authorization",
+                "placeholder": "请输入同花顺 iFinD Authorization",
+                "description": "同花顺 iFinD MCP 服务通过 Authorization 请求头认证。",
+                "helpText": "从同花顺 iFinD MCP 配置中复制 Authorization 值后填入。",
+                "helpLinkText": "如何获取同花顺 iFinD Authorization?"
+            },
+            "servers": [
+                {
+                    "id": 3001,
+                    "name": "hexin-ifind-ds-stock-mcp",
+                    "description": "用于查询同花顺 iFinD 股票、基金、EDB 宏观指标、财经资讯、债券、全球股票和指数等金融数据。",
+                    "transport_type": "streamable_http",
+                    "required_headers": "[\"Authorization\"]",
+                    "url": "https://api-mcp.51ifind.com:8643/ds-mcp-servers/hexin-ifind-ds-stock-mcp"
+                },
+                {
+                    "id": 3002,
+                    "name": "hexin-ifind-ds-fund-mcp",
+                    "description": "用于查询同花顺 iFinD 股票、基金、EDB 宏观指标、财经资讯、债券、全球股票和指数等金融数据。",
+                    "transport_type": "streamable_http",
+                    "required_headers": "[\"Authorization\"]",
+                    "url": "https://api-mcp.51ifind.com:8643/ds-mcp-servers/hexin-ifind-ds-fund-mcp"
+                },
+                {
+                    "id": 3003,
+                    "name": "hexin-ifind-ds-edb-mcp",
+                    "description": "用于查询同花顺 iFinD 股票、基金、EDB 宏观指标、财经资讯、债券、全球股票和指数等金融数据。",
+                    "transport_type": "streamable_http",
+                    "required_headers": "[\"Authorization\"]",
+                    "url": "https://api-mcp.51ifind.com:8643/ds-mcp-servers/hexin-ifind-ds-edb-mcp"
+                },
+                {
+                    "id": 3004,
+                    "name": "hexin-ifind-ds-news-mcp",
+                    "description": "用于查询同花顺 iFinD 股票、基金、EDB 宏观指标、财经资讯、债券、全球股票和指数等金融数据。",
+                    "transport_type": "streamable_http",
+                    "required_headers": "[\"Authorization\"]",
+                    "url": "https://api-mcp.51ifind.com:8643/ds-mcp-servers/hexin-ifind-ds-news-mcp"
+                },
+                {
+                    "id": 3005,
+                    "name": "hexin-ifind-ds-bond-mcp",
+                    "description": "用于查询同花顺 iFinD 股票、基金、EDB 宏观指标、财经资讯、债券、全球股票和指数等金融数据。",
+                    "transport_type": "streamable_http",
+                    "required_headers": "[\"Authorization\"]",
+                    "url": "https://api-mcp.51ifind.com:8643/ds-mcp-servers/hexin-ifind-ds-bond-mcp"
+                },
+                {
+                    "id": 3006,
+                    "name": "hexin-ifind-ds-global-stock-mcp",
+                    "description": "用于查询同花顺 iFinD 股票、基金、EDB 宏观指标、财经资讯、债券、全球股票和指数等金融数据。",
+                    "transport_type": "streamable_http",
+                    "required_headers": "[\"Authorization\"]",
+                    "url": "https://api-mcp.51ifind.com:8643/ds-mcp-servers/hexin-ifind-ds-global-stock-mcp"
+                },
+                {
+                    "id": 3007,
+                    "name": "hexin-ifind-ds-index-mcp",
+                    "description": "用于查询同花顺 iFinD 股票、基金、EDB 宏观指标、财经资讯、债券、全球股票和指数等金融数据。",
+                    "transport_type": "streamable_http",
+                    "required_headers": "[\"Authorization\"]",
+                    "url": "https://api-mcp.51ifind.com:8643/ds-mcp-servers/hexin-ifind-ds-index-mcp"
+                }
+            ]
+        },
+        {
+            "id": 4000,
+            "name": "pkulaw",
+            "displayName": "北大法宝",
+            "description": "提供北大法宝法律数据检索能力，支持法律法规库查询、法条详情获取及司法案例检索。当前版本仅开放以下两项语义检索服务：检索法律法规–语义、检索司法案例–语义。",
+            "category": "法律",
+            "min_app_version": "",
+            "skill_package_url": "https://up.qcc.com/manage/41d2a1fe-afaf-47cc-b88c-9afff6307798/pkulaw.zip",
+            "auth": {
+                "type": "apiKey",
+                "target": "header",
+                "key": "Authorization",
+                "valuePrefix": "Bearer ",
+                "helpUrl": "https://mcp.pkulaw.com/console",
+                "label": "Access Token",
+                "placeholder": "请输入北大法宝 Access Token",
+                "description": "北大法宝 MCP 服务使用 OAuth2 Token，通过 Authorization: Bearer <token> 认证。",
+                "helpText": "在北大法宝开发者控制台创建应用并开通 MCP 服务后生成 Access Token。",
+                "helpLinkText": "如何获取北大法宝 Access Token?"
+            },
+            "servers": [
+                {
+                    "id": 4001,
+                    "name": "pkulaw-law-search-service",
+                    "description": "用于北大法宝法律法规检索、法规条文详情获取和司法案例检索等法律数据服务。",
+                    "transport_type": "streamable_http",
+                    "required_headers": "[\"Authorization\"]",
+                    "url": "https://apim-gateway.pkulaw.com/mcp-law-search-service"
+                },
+                {
+                    "id": 4002,
+                    "name": "pkulaw-case-search-service",
+                    "description": "用于北大法宝法律法规检索、法规条文详情获取和司法案例检索等法律数据服务。",
+                    "transport_type": "streamable_http",
+                    "required_headers": "[\"Authorization\"]",
+                    "url": "https://apim-gateway.pkulaw.com/mcp-case-search-service"
+                }
+            ]
+        },
+        {
+            "id": 5000,
+            "name": "wind",
+            "displayName": "Wind 金融",
+            "description": "用于查询万得股票、债券、基金、指数、宏观经济、金融文档和金融数据计算等金融数据服务。",
+            "category": "金融",
+            "min_app_version": "",
+            "skill_package_url": "https://up.qcc.com/manage/d252a112-cc01-4c0e-bb08-66dcae203a6a/wind.zip",
+            "auth": {
+                "type": "apiKey",
+                "target": "header",
+                "key": "Authorization",
+                "valuePrefix": "Bearer ",
+                "helpUrl": "https://aifinmarket.wind.com.cn/#/login",
+                "label": "Wind API Key",
+                "placeholder": "请输入 Wind API Key",
+                "description": "Wind MCP 服务通过 Authorization: Bearer  请求头认证。",
+                "helpText": "从 Wind 开发者中心获取 API Key 后填入，保存后会自动写入每个 Wind MCP Server 的 Authorization 请求头。",
+                "helpLinkText": "打开 Wind 开发者中心"
+            },
+            "servers": [
+                {
+                    "id": 5001,
+                    "name": "wind_stock_data",
+                    "description": "万得股票数据服务。",
+                    "transport_type": "http",
+                    "required_headers": "[\"Authorization\"]",
+                    "headers": {
+                        "Accept": "application/json, text/event-stream"
+                    },
+                    "url": "https://mcp.wind.com.cn/vserver_stock_data/mcp/"
+                },
+                {
+                    "id": 5002,
+                    "name": "wind_bond_data",
+                    "description": "万得债券数据服务。",
+                    "transport_type": "http",
+                    "required_headers": "[\"Authorization\"]",
+                    "headers": {
+                        "Accept": "application/json, text/event-stream"
+                    },
+                    "url": "https://mcp.wind.com.cn/vserver_bond_data/mcp/"
+                },
+                {
+                    "id": 5003,
+                    "name": "wind_fund_data",
+                    "description": "万得基金数据服务。",
+                    "transport_type": "http",
+                    "required_headers": "[\"Authorization\"]",
+                    "headers": {
+                        "Accept": "application/json, text/event-stream"
+                    },
+                    "url": "https://mcp.wind.com.cn/vserver_fund_data/mcp/"
+                },
+                {
+                    "id": 5004,
+                    "name": "wind_index_data",
+                    "description": "万得指数数据服务。",
+                    "transport_type": "http",
+                    "required_headers": "[\"Authorization\"]",
+                    "headers": {
+                        "Accept": "application/json, text/event-stream"
+                    },
+                    "url": "https://mcp.wind.com.cn/vserver_index_data/mcp/"
+                },
+                {
+                    "id": 5005,
+                    "name": "wind_economic_data",
+                    "description": "万得宏观经济数据服务。",
+                    "transport_type": "http",
+                    "required_headers": "[\"Authorization\"]",
+                    "headers": {
+                        "Accept": "application/json, text/event-stream"
+                    },
+                    "url": "https://mcp.wind.com.cn/vserver_economic_data/mcp/"
+                },
+                {
+                    "id": 5006,
+                    "name": "vserver_financial_info",
+                    "description": "万得金融文档检索服务。",
+                    "transport_type": "http",
+                    "required_headers": "[\"Authorization\"]",
+                    "headers": {
+                        "Accept": "application/json, text/event-stream"
+                    },
+                    "url": "https://mcp.wind.com.cn/vserver_financial_docs/mcp/"
+                },
+                {
+                    "id": 5007,
+                    "name": "wind_analytics_data",
+                    "description": "万得金融数据计算服务。",
+                    "transport_type": "http",
+                    "required_headers": "[\"Authorization\"]",
+                    "headers": {
+                        "Accept": "application/json, text/event-stream"
+                    },
+                    "url": "https://mcp.wind.com.cn/vserver_analytics_data/mcp/"
+                }
+            ]
+        },
+        {
+            "id": 5,
+            "name": "ima",
+            "displayName": "腾讯 IMA",
+            "description": "腾讯 IMA（智能知识工作台）开放的官方 OpenAPI 入口，供 AI Agent / 外部程序调用用户账号下的笔记与知识库能力，相当于给 Agent 接入\"个人持久化记忆\"。",
+            "category": "工具",
+            "min_app_version": "",
+            "skill_package_url": "https://up.qcc.com/manage/7ffd7b43-9627-4a5d-b231-62523d1aa422/ima.zip",
+            "auth": {
+                "type": "apiKey",
+                "target": "env",
+                "label": "IMA OpenAPI 凭证",
+                "description": "IMA OpenAPI 需要同时配置 Client ID 和 API Key。",
+                "helpUrl": "https://ima.qq.com/agent-interface",
+                "helpText": "在 IMA Agent Interface 页面获取 Client ID 和 API Key 后填入。",
+                "helpLinkText": "如何获取 IMA OpenAPI 凭证?",
+                "executionMode": "skill",
+                "fields": [
+                    {
+                        "key": "IMA_OPENAPI_CLIENTID",
+                        "label": "Client ID",
+                        "placeholder": "请输入 IMA Client ID"
+                    },
+                    {
+                        "key": "IMA_OPENAPI_APIKEY",
+                        "label": "API Key",
+                        "placeholder": "请输入 IMA API Key"
+                    }
+                ]
+            },
+            "servers": [
+                {
+                    "id": 23,
+                    "name": "ima",
+                    "description": "",
+                    "transport_type": "stdio",
+                    "command": "",
+                    "args": "[]",
+                    "required_headers": "[]"
+                }
+            ]
+        }
+    ]
+}

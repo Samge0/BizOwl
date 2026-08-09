@@ -1,0 +1,11 @@
+{
+  "name": "钉钉文档",
+  "name_en": "DingTalk Docs",
+  "description": "用于钉钉文档搜索、创建、读取和编辑，支持知识库节点、文件夹、权限、附件及文档导出管理。",
+  "description_zh": "用于钉钉文档搜索、创建、读取和编辑，支持知识库节点、文件夹、权限、附件及文档导出管理。",
+  "description_en": "Search, create, read, and edit DingTalk documents, including knowledge base nodes, folders, permissions, attachments, and document export management.",
+  "source": "dingtalk-doc",
+  "type": "mcp",
+  "auth_mode": "apiKey",
+  "version": "1.0.0"
+}

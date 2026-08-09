@@ -1,0 +1,11 @@
+{
+  "name": "QVeris",
+  "name_en": "QVeris",
+  "description": "通过 discover、inspect、call 发现并调用第三方数据、API 和工具，覆盖量化行情、宏观固收、投研、风险合规等金融 agent 场景。",
+  "description_zh": "通过 discover、inspect、call 发现并调用第三方数据、API 和工具，覆盖量化行情、宏观固收、投研、风险合规等金融 agent 场景。",
+  "description_en": "Discover, inspect, and call third-party data, APIs, and tools for financial agent scenarios such as quantitative market data, macro fixed income, research, risk, and compliance.",
+  "source": "qveris",
+  "type": "mcp",
+  "auth_mode": "apiKey",
+  "version": "1.0.0"
+}

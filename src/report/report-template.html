@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>{{title}} · BizOwl 研究报告</title>
+<style>
+  @page {
+    size: A4;
+    margin: 16mm 14mm 16mm 14mm;
+    @bottom-center {
+      content: counter(page) " / " counter(pages);
+      font-size: 9px;
+      color: #888;
+    }
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    font-family: "PingFang SC", "Microsoft YaHei", "Source Han Sans SC",
+                 "Noto Sans CJK SC", "Helvetica Neue", Arial, sans-serif;
+    font-size: 10.5pt;
+    line-height: 1.6;
+    color: #1f2933;
+    margin: 0;
+    padding: 0;
+  }
+  /* ========== 封面（唯一保留 page-break-after 的元素） ========== */
+  .cover {
+    page-break-after: always;
+    text-align: center;
+    padding-top: 55mm;
+  }
+  .cover .badge {
+    display: inline-block;
+    padding: 4px 14px;
+    background: #0a4f8f;
+    color: #fff;
+    font-size: 10pt;
+    border-radius: 999px;
+    letter-spacing: 2px;
+    margin-bottom: 18mm;
+  }
+  .cover h1 {
+    font-size: 28pt;
+    font-weight: 700;
+    color: #0f172a;
+    margin: 0 0 6mm 0;
+    line-height: 1.3;
+  }
+  .cover .subtitle {
+    font-size: 13pt;
+    color: #475569;
+    margin-bottom: 28mm;
+  }
+  .cover .meta {
+    font-size: 11pt;
+    color: #64748b;
+    line-height: 2;
+  }
+  .cover .author {
+    margin-top: 36mm;
+    font-size: 10pt;
+    color: #94a3b8;
+    letter-spacing: 1px;
+  }
+  /* ========== 通用 ========== */
+  h2 {
+    font-size: 15pt;
+    color: #0f172a;
+    border-left: 4px solid #0a4f8f;
+    padding-left: 10px;
+    margin: 22px 0 8px 0;
+    /* 避免 h2 孤悬页底（与后续内容保持同页） */
+    break-after: avoid;
+    page-break-after: avoid;
+  }
+  h3 {
+    font-size: 12pt;
+    color: #1e293b;
+    margin: 14px 0 5px 0;
+    break-after: avoid;
+    page-break-after: avoid;
+  }
+  h4 {
+    font-size: 11pt;
+    color: #334155;
+    margin: 10px 0 4px 0;
+    break-after: avoid;
+    page-break-after: avoid;
+  }
+  p { margin: 5px 0; }
+  .muted { color: #94a3b8; font-size: 9pt; }
+  a { color: #1d4ed8; text-decoration: none; word-break: break-all; }
+  ul, ol { margin: 5px 0; padding-left: 22px; }
+  li { margin: 2px 0; }
+  blockquote {
+    margin: 8px 0;
+    padding: 5px 12px;
+    border-left: 3px solid #cbd5e1;
+    color: #475569;
+    background: #f8fafc;
+  }
+  code {
+    font-family: "SF Mono", Menlo, Consolas, monospace;
+    font-size: 9.5pt;
+    background: #f1f5f9;
+    padding: 1px 5px;
+    border-radius: 4px;
+  }
+  pre {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 10px;
+    overflow-x: auto;
+    font-size: 9pt;
+    white-space: pre-wrap;
+  }
+  pre code { background: none; padding: 0; }
+  /* ========== 章节 — 不强制换页，自然流式排版 ========== */
+  .chapter {
+    margin-top: 14px;
+    padding-top: 8px;
+    border-top: 0.5px solid #e2e8f0;
+    /* 关键：不设 page-break-before，避免标题后大片空白 */
+  }
+  .chapter:first-of-type {
+    margin-top: 0;
+    border-top: none;
+  }
+  /* 摘要后换一次页（封面→摘要自然过渡），其余章节自然流式 */
+  .abstract { page-break-after: always; }
+  /* 评分总表/参考文献：不再独占页，让前面章节的尾段填满空间 */
+  .section-body { margin: 4px 0 10px 0; }
+  /* ========== 摘要 ========== */
+  .abstract .score-box {
+    display: flex;
+    gap: 14px;
+    margin: 16px 0;
+  }
+  .abstract .score-card {
+    flex: 1;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 12px 14px;
+    background: #f8fafc;
+  }
+  .abstract .score-card .label {
+    font-size: 9pt;
+    color: #64748b;
+    letter-spacing: 1px;
+  }
+  .abstract .score-card .value {
+    font-size: 22pt;
+    font-weight: 700;
+    color: #0a4f8f;
+    line-height: 1.2;
+  }
+  /* ========== 评分表 ========== */
+  table.score-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 10px 0;
+    font-size: 9.5pt;
+    page-break-inside: auto;
+  }
+  table.score-table caption {
+    font-size: 10pt;
+    font-weight: 600;
+    color: #0f172a;
+    margin-bottom: 6px;
+    text-align: left;
+  }
+  table.score-table th {
+    background: #0a4f8f;
+    color: #fff;
+    text-align: left;
+    padding: 6px 8px;
+    font-weight: 600;
+  }
+  table.score-table td {
+    border-bottom: 1px solid #e2e8f0;
+    padding: 6px 8px;
+    vertical-align: top;
+    line-height: 1.4;
+  }
+  table.score-table tbody tr { page-break-inside: avoid; }
+  table.score-table tbody tr:nth-child(odd) { background: #f8fafc; }
+  /* ========== 普通表格（数据对比等） ========== */
+  .section-body table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 8px 0;
+    font-size: 9.5pt;
+  }
+  .section-body table th {
+    background: #f1f5f9;
+    color: #1e293b;
+    text-align: left;
+    padding: 6px 8px;
+    border: 0.5px solid #e2e8f0;
+    font-weight: 600;
+  }
+  .section-body table td {
+    padding: 6px 8px;
+    border: 0.5px solid #e2e8f0;
+    line-height: 1.4;
+  }
+  /* ========== 参考文献 ========== */
+  ol.references {
+    font-size: 9.5pt;
+    color: #334155;
+    padding-left: 22px;
+    line-height: 1.65;
+  }
+  ol.references li {
+    margin-bottom: 5px;
+    word-break: break-all;
+    page-break-inside: avoid;
+  }
+  /* ========== 目录（不强制换页，紧跟摘要之后） ========== */
+  .toc h2 { margin-top: 0; }
+  .toc ul { list-style: none; padding-left: 0; }
+  .toc li {
+    padding: 4px 0;
+    border-bottom: 0.5px dotted #cbd5e1;
+    font-size: 10.5pt;
+    line-height: 1.4;
+  }
+  .toc li.sub { padding-left: 18px; font-size: 10pt; color: #475569; }
+  /* ========== 提示块 ========== */
+  .note {
+    background: #fef3c7;
+    border-left: 3px solid #f59e0b;
+    padding: 7px 11px;
+    margin: 8px 0;
+    font-size: 9.5pt;
+    color: #78350f;
+    page-break-inside: avoid;
+  }
+  .data-gap {
+    background: #fee2e2;
+    border-left: 3px solid #ef4444;
+    padding: 6px 10px;
+    margin: 7px 0;
+    font-size: 9.5pt;
+    color: #991b1b;
+    page-break-inside: avoid;
+  }
+  /* ========== 图表区域 ========== */
+  .chart-box {
+    margin: 10px 0;
+    padding: 12px;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    background: #fff;
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+  .chart-box .chart-title {
+    font-size: 10.5pt;
+    font-weight: 600;
+    color: #0f172a;
+    margin-bottom: 8px;
+  }
+
+  /* === 柱状图（横向，标签自适应宽度，避免文字堆叠） === */
+  .bar-row {
+    display: flex;
+    align-items: center;
+    margin: 7px 0;       /* 行间距充足，不堆叠 */
+    font-size: 9.5pt;
+    line-height: 1.3;
+  }
+  .bar-row .bar-label {
+    width: 34%;           /* 自适应长标签（中文公司名/年份），固定像素会截断 */
+    min-width: 80px;
+    max-width: 220px;
+    text-align: right;
+    padding-right: 10px;
+    color: #334155;
+    flex-shrink: 0;
+    word-break: break-all;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .bar-row .bar-track {
+    flex: 1;
+    background: #f1f5f9;
+    border-radius: 4px;
+    height: 16px;
+    overflow: hidden;
+    min-width: 60px;
+  }
+  .bar-row .bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #0a4f8f, #1d4ed8);
+    border-radius: 4px;
+    transition: width 0.3s;
+  }
+  .bar-row .bar-val {
+    width: 56px;
+    text-align: left;
+    padding-left: 8px;
+    color: #0f172a;
+    font-weight: 600;
+    flex-shrink: 0;
+  }
+
+  /* === 评分卡（多维度评分可视化） === */
+  .score-cards {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 10px 0;
+  }
+  .score-cards .dim-card {
+    flex: 1 1 140px;
+    min-width: 130px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 10px 12px;
+    background: #f8fafc;
+    page-break-inside: avoid;
+  }
+  .score-cards .dim-card .dim-name {
+    font-size: 9pt;
+    color: #64748b;
+    margin-bottom: 3px;
+    line-height: 1.3;
+  }
+  .score-cards .dim-card .dim-score {
+    font-size: 18pt;
+    font-weight: 700;
+    color: #0a4f8f;
+    line-height: 1.1;
+  }
+  .score-cards .dim-card .dim-bar {
+    margin-top: 6px;
+    height: 5px;
+    background: #e2e8f0;
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .score-cards .dim-card .dim-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #0a4f8f, #1d4ed8);
+  }
+
+  /* === 时间线（垂直，适合发展历程/里程碑/事件流） === */
+  .timeline {
+    position: relative;
+    padding-left: 24px;
+    margin: 12px 0;
+  }
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 8px;
+    top: 4px;
+    bottom: 4px;
+    width: 2px;
+    background: #cbd5e1;
+  }
+  .timeline .tl-item {
+    position: relative;
+    margin-bottom: 12px;
+    padding-left: 4px;
+    page-break-inside: avoid;
+  }
+  .timeline .tl-item::before {
+    content: '';
+    position: absolute;
+    left: -20px;
+    top: 5px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #0a4f8f;
+    border: 2px solid #fff;
+    box-shadow: 0 0 0 1.5px #0a4f8f;
+  }
+  .timeline .tl-date {
+    font-size: 9pt;
+    font-weight: 600;
+    color: #0a4f8f;
+    margin-bottom: 2px;
+  }
+  .timeline .tl-title {
+    font-size: 10pt;
+    font-weight: 600;
+    color: #1e293b;
+    line-height: 1.35;
+  }
+  .timeline .tl-desc {
+    font-size: 9.5pt;
+    color: #475569;
+    margin-top: 2px;
+    line-height: 1.45;
+  }
+
+  /* === KPI 指标卡（关键数据突出展示） === */
+  .kpi-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 10px 0;
+  }
+  .kpi-grid .kpi-card {
+    flex: 1 1 120px;
+    min-width: 110px;
+    border: 1px solid #e2e8f0;
+    border-left: 3px solid #0a4f8f;
+    border-radius: 8px;
+    padding: 10px 12px;
+    background: #fff;
+    page-break-inside: avoid;
+  }
+  .kpi-grid .kpi-label {
+    font-size: 8.5pt;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 4px;
+  }
+  .kpi-grid .kpi-value {
+    font-size: 16pt;
+    font-weight: 700;
+    color: #0f172a;
+    line-height: 1.2;
+  }
+  .kpi-grid .kpi-unit {
+    font-size: 10pt;
+    font-weight: 400;
+    color: #64748b;
+    margin-left: 3px;
+  }
+  .kpi-grid .kpi-delta {
+    font-size: 9pt;
+    margin-top: 3px;
+  }
+  .kpi-grid .kpi-up { color: #16a34a; }
+  .kpi-grid .kpi-down { color: #dc2626; }
+
+  /* === 进度环（单维度达成度） === */
+  .ring-row { display: flex; flex-wrap: wrap; gap: 14px; margin: 10px 0; }
+  .ring-card {
+    width: 110px;
+    text-align: center;
+    page-break-inside: avoid;
+  }
+  .ring-card svg { display: block; margin: 0 auto; }
+  .ring-card .ring-label {
+    font-size: 9pt;
+    color: #475569;
+    margin-top: 4px;
+    line-height: 1.3;
+  }
+
+  /* === 雷达图容器（SVG，由 LLM 生成 path） === */
+  .radar-box {
+    margin: 10px 0;
+    padding: 10px;
+    text-align: center;
+    page-break-inside: avoid;
+  }
+  .radar-box svg { max-width: 100%; height: auto; }
+</style>
+</head>
+<body>
+
+<!-- ========== 封面 ========== -->
+<section class="cover">
+  <div class="badge">BIZOWL · 深度研究报告</div>
+  <h1>{{title}}</h1>
+  <div class="subtitle">{{subtitle}}</div>
+  <div class="meta">
+    报告类型：{{report_type}}<br>
+    生成日期：{{date}}
+  </div>
+  <div class="author">由 BizOwl AI 自动生成 · 仅供参考</div>
+</section>
+
+<!-- ========== 摘要 ========== -->
+<section class="abstract">
+  <h2>摘要</h2>
+  <p>{{abstract}}</p>
+  <div class="score-box">
+    <div class="score-card">
+      <div class="label">综合评分</div>
+      <div class="value">{{total_score}}</div>
+    </div>
+    <div class="score-card">
+      <div class="label">置信度</div>
+      <div class="value">{{confidence}}</div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== 目录 ========== -->
+<section class="toc">
+  <h2>目录</h2>
+  <ul>
+    <li>1. 摘要</li>
+    <li>2. 正文</li>
+    <li>3. 评分总表</li>
+    <li>4. 图表</li>
+    <li>5. 参考文献</li>
+    <li>6. 附录</li>
+  </ul>
+</section>
+
+<!-- ========== 正文各章（自然流式排版，不强制换页） ========== -->
+{{chapters}}
+
+<!-- ========== 评分总表（紧跟正文，不独占页） ========== -->
+<section class="chapter">
+  <h2>评分总表</h2>
+  {{score_table}}
+</section>
+
+<!-- ========== 图表（紧跟，不独占页） ========== -->
+{{charts_html}}
+
+<!-- ========== 参考文献（紧跟，不独占页） ========== -->
+<section class="chapter">
+  <h2>参考文献</h2>
+  {{references}}
+</section>
+
+<!-- ========== 附录 ========== -->
+{{appendix}}
+
+</body>
+</html>

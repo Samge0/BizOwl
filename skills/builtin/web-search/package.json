@@ -1,0 +1,38 @@
+{
+  "name": "@bizowl/skill-web-search",
+  "version": "1.0.2",
+  "description": "Web search skill using Playwright-controlled browser for real-time information retrieval",
+  "main": "dist/server/index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/server/index.js",
+    "dev": "tsc && node dist/server/index.js",
+    "test": "npm run build && node server/config.test.js && node server/health.test.js && node scripts/server-state.test.js && node scripts/electron-fallback-search.test.js && node scripts/windows-wrapper.test.js"
+  },
+  "keywords": [
+    "bizowl",
+    "skill",
+    "web-search",
+    "playwright",
+    "cdp"
+  ],
+  "author": "BizOwl",
+  "license": "MIT",
+  "dependencies": {
+    "@mozilla/readability": "^0.6.0",
+    "@types/jsdom": "^28.0.3",
+    "crawlee": "^3.17.0",
+    "express": "^4.18.2",
+    "jsdom": "^29.1.1",
+    "keyv": "^5.6.0",
+    "playwright": "^1.60.0",
+    "user-agents": "^2.1.146",
+    "uuid": "^14.0.1"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.20",
+    "@types/node": "^20.10.0",
+    "@types/uuid": "^9.0.7",
+    "typescript": "^5.3.0"
+  }
+}

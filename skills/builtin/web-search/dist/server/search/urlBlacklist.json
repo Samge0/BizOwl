@@ -1,0 +1,18 @@
+{
+    "domains": [
+        "qcc.com",
+        "tianyancha.com",
+        "qixin.com",
+        "xiaolanben.com",
+        "shuidi.cn",
+        "qyyjt.cn"
+    ],
+    "urlIncludes": [
+        "aiqicha.baidu.com"
+    ],
+    "textIncludes": [
+        "爱企查",
+        "天眼查",
+        "启信宝"
+    ]
+}

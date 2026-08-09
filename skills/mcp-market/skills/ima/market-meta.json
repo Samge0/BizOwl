@@ -1,0 +1,11 @@
+{
+  "name": "IMA 知识库与笔记",
+  "name_en": "IMA Knowledge Base and Notes",
+  "description": "用于 IMA 笔记搜索、创建、追加，以及知识库上传、搜索和浏览。",
+  "description_zh": "用于 IMA 笔记搜索、创建、追加，以及知识库上传、搜索和浏览。",
+  "description_en": "Search, create, and append IMA notes, and upload, search, and browse IMA knowledge bases.",
+  "source": "ima",
+  "type": "skill",
+  "auth_mode": "apiKey",
+  "version": "1.1.7"
+}
