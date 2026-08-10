@@ -49,3 +49,6 @@ skills/builtin/web-search/.connection
 # Temporary files
 temp-*
 /tmp/
+
+# custom
+.connection

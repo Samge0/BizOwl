@@ -149,7 +149,7 @@
 
         const label = document.createElement('span');
         label.textContent = msg;
-        label.style.cssText = 'line-height: 1.35;';
+        label.style.cssText = 'line-height: 1.35; white-space: pre-line;';
         banner.appendChild(label);
 
         document.body.appendChild(banner);

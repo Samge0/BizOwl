@@ -1,6 +1,6 @@
 {
   "name": "BizOwl",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "BizOwl - 轻量级 AI 商业助手桌面应用",
   "main": "electron/main.cjs",
   "desktopName": "BizOwl",

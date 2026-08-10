@@ -470,6 +470,7 @@ function registerIpcHandlers() {
   ipcMain.handle('auth:logout', async () => qccAuth.logout());
   ipcMain.handle('auth:setToken', async (_evt, token, baseUrl) => qccAuth.setTokenManually(token, baseUrl));
   ipcMain.handle('auth:verify', async () => qccAuth.verifySession());
+  ipcMain.handle('auth:bindInviteCode', async (_evt, code) => qccAuth.bindInviteCode(code));
   // 扫码登录
   ipcMain.handle('auth:generateQrLogin', async () => qccAuth.generateQrLoginSession());
   ipcMain.handle('auth:getQrLoginStatus', async (_evt, sid) => qccAuth.getQrLoginStatus(sid));

@@ -21,6 +21,7 @@ contextBridge.exposeInMainWorld('clawAPI', {
   authLogout: () => ipcRenderer.invoke('auth:logout'),
   authSetToken: (token, baseUrl) => ipcRenderer.invoke('auth:setToken', token, baseUrl),
   authVerify: () => ipcRenderer.invoke('auth:verify'),
+  authBindInviteCode: (code) => ipcRenderer.invoke('auth:bindInviteCode', code),
   // 扫码登录
   authGenerateQrLogin: () => ipcRenderer.invoke('auth:generateQrLogin'),
   authGetQrLoginStatus: (sid) => ipcRenderer.invoke('auth:getQrLoginStatus', sid),

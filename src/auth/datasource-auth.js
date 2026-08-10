@@ -30,7 +30,7 @@ function createDefaultState() {
     accessToken: null,
     refreshToken: null,
     phone: null,
-    internationalCode: '86',
+    internationalCode: '+86',
     userInfo: null, // { userId, phone, nickname, avatarUrl }
     apiBaseUrl: DEFAULT_API_BASE,
     autoRefresh: false, // 是否自动刷新 token（仅扫码/验证码登录可开启）
@@ -169,9 +169,12 @@ function qccRequest(authState, apiPath, options = {}) {
  * 1. 渲染层先通过 GeeTest4 SDK 完成人机验证，获得 captcha result
  * 2. 将 captcha result + phone 发到 /auth/send-code-with-geetest
  */
-export async function sendCode(phone, internationalCode = '86', captcha = null) {
+export async function sendCode(phone, internationalCode = '+86', captcha = null) {
   const state = loadAuthState();
-  console.log(`[QccAuth] 发送验证码到 +${internationalCode} ${phone}`);
+  // 与原版一致：internationalCode 带 "+" 前缀
+  const intl = (internationalCode?.trim() || '+86');
+  const normalizedIntl = intl.startsWith('+') ? intl : '+' + intl;
+  console.log(`[QccAuth] 发送验证码到 ${normalizedIntl} ${phone}`);
 
   if (!captcha) {
     return { success: false, message: '请先完成人机验证' };
@@ -182,7 +185,7 @@ export async function sendCode(phone, internationalCode = '86', captcha = null) 
       method: 'POST',
       body: {
         phone,
-        internationalCode,
+        internationalCode: normalizedIntl,
         geeLotNumber: captcha.lot_number,
         geeCaptchaOutput: captcha.captcha_output,
         geePassToken: captcha.pass_token,
@@ -190,7 +193,25 @@ export async function sendCode(phone, internationalCode = '86', captcha = null) 
       },
     });
     console.log('[QccAuth] send-code 响应:', JSON.stringify(result));
-    return { success: true, message: result.msg || result.message || '验证码已发送' };
+
+    // ⚠️ HTTP 200 不代表短信真正发出——必须检查业务状态码。
+    // QCC API 约定：code/status === 0 或 200 表示成功，其他均为失败。
+    // 有些错误响应仍然返回 HTTP 200（如频率限制、验证码失效、手机号异常）。
+    const bizCode = result.code ?? result.status ?? null;
+    const bizMsg = result.msg || result.message || '';
+
+    // 明确失败：code/status 为非零非 200 的值
+    if (bizCode !== null && bizCode !== 0 && bizCode !== 200 && bizCode !== '0' && bizCode !== '200') {
+      console.warn('[QccAuth] send-code 业务失败:', bizCode, bizMsg);
+      return { success: false, message: bizMsg || `服务端返回错误码: ${bizCode}`, raw: result };
+    }
+
+    // 有些响应用 success:false 表示失败
+    if (result.success === false) {
+      return { success: false, message: bizMsg || '发送失败', raw: result };
+    }
+
+    return { success: true, message: bizMsg || '验证码已发送', raw: result };
   } catch (err) {
     console.error('[QccAuth] 发送验证码失败:', err.message);
     return { success: false, message: err.message };
@@ -200,12 +221,20 @@ export async function sendCode(phone, internationalCode = '86', captcha = null) 
 /**
  * 登录
  */
-export async function login(phone, code, internationalCode = '86') {
+export async function login(phone, code, internationalCode = '+86') {
   const state = loadAuthState();
-  console.log(`[QccAuth] 登录: +${internationalCode} ${phone}`);
+  // 与原版一致：internationalCode 带 "+" 前缀（如 "+86"）
+  // 不带 "+" 可能导致服务端返回无资格的 token
+  const normalizedIntl = internationalCode?.trim() || '+86';
+  if (!normalizedIntl.startsWith('+')) {
+    // 兼容前端传入 "86" 的情况
+    console.warn(`[QccAuth] internationalCode 不带 "+" 前缀，自动修正: "${internationalCode}" → "+${normalizedIntl}"`);
+  }
+  const intl = normalizedIntl.startsWith('+') ? normalizedIntl : '+' + normalizedIntl;
+  console.log(`[QccAuth] 登录: ${intl} ${phone}`);
   const payload = await qccRequest(state, '/auth/login', {
     method: 'POST',
-    body: { phone, code, internationalCode },
+    body: { phone, code, internationalCode: intl },
   });
 
   // 解析返回（兼容 getEnvelopeResult 的多形态封装）
@@ -224,12 +253,13 @@ export async function login(phone, code, internationalCode = '86') {
     accessToken,
     refreshToken,
     phone,
-    internationalCode,
+    internationalCode: intl,
     userInfo: userInfo ? {
       userId: userInfo.userId || userInfo.guid || '',
       phone: userInfo.phone || phone,
       nickname: userInfo.nickname || phone,
       avatarUrl: userInfo.avatarUrl || userInfo.faceimg || null,
+      checkInvite: userInfo.checkInvite === true,
     } : null,
   };
   saveAuthState(nextState);
@@ -288,6 +318,7 @@ export async function getQrLoginStatus(sessionId) {
       phone: userInfoRecord.phone || '',
       nickname: userInfoRecord.nickname || userInfoRecord.phone || '',
       avatarUrl: userInfoRecord.avatarUrl || userInfoRecord.faceimg || null,
+      checkInvite: userInfoRecord.checkInvite === true,
     } : null;
 
     const nextState = {
@@ -295,7 +326,7 @@ export async function getQrLoginStatus(sessionId) {
       accessToken,
       refreshToken,
       phone: userInfo?.phone || '',
-      internationalCode: '86',
+      internationalCode: '+86',
       userInfo,
     };
     saveAuthState(nextState);
@@ -311,6 +342,42 @@ export async function getQrLoginStatus(sessionId) {
 }
 
 /**
+ * 绑定邀请码（激活试用资格）
+ * 登录后如果 checkInvite 为 true，需要调用此接口绑定 8 位邀请码，
+ * 否则积分接口返回 40106 "请先申请试用资格"。
+ */
+export async function bindInviteCode(inviteCode) {
+  const code = String(inviteCode || '').replace(/\s+/g, '').trim();
+  if (!code) throw new Error('邀请码不能为空');
+  const state = loadAuthState();
+  const payload = await qccRequest(state, '/auth/bind-invite-code', {
+    method: 'POST',
+    body: { inviteCode: code },
+  });
+  console.log('[QccAuth] bind-invite-code 响应:', JSON.stringify(payload));
+  // 绑定成功后重新拉取用户信息，更新 checkInvite 状态
+  try {
+    const userResp = await qccRequest(state, '/auth/user-info-by-token', { method: 'POST' });
+    const userData = userResp.result || userResp.data || userResp;
+    if (userData) {
+      saveAuthState({
+        ...state,
+        userInfo: {
+          userId: userData.userId || userData.guid || state.userInfo?.userId || '',
+          phone: userData.phone || state.userInfo?.phone || state.phone || '',
+          nickname: userData.nickname || userData.phone || state.userInfo?.nickname || '用户',
+          avatarUrl: userData.avatarUrl || userData.faceimg || state.userInfo?.avatarUrl || null,
+          checkInvite: userData.checkInvite === true,
+        },
+      });
+    }
+  } catch (e) {
+    console.warn('[QccAuth] 绑定后获取用户信息失败:', e.message);
+  }
+  return { success: true, message: payload.msg || payload.message || '邀请码绑定成功' };
+}
+
+/**
  * 获取积分信息
  * 返回 { balance, totalEarned, totalConsumed }
  */
@@ -320,10 +387,12 @@ export async function getCreditsInfo() {
     method: 'POST',
   });
   const data = payload.data || payload.result || payload;
+  // result 可能是 null（如 40106 "请先申请试用资格"），需要保护
+  const safeData = data || {};
   return {
-    balance: typeof data.balance === 'number' ? data.balance : 0,
-    totalEarned: typeof data.totalEarned === 'number' ? data.totalEarned : 0,
-    totalConsumed: typeof data.totalConsumed === 'number' ? data.totalConsumed : 0,
+    balance: typeof safeData.balance === 'number' ? safeData.balance : 0,
+    totalEarned: typeof safeData.totalEarned === 'number' ? safeData.totalEarned : 0,
+    totalConsumed: typeof safeData.totalConsumed === 'number' ? safeData.totalConsumed : 0,
   };
 }
 
@@ -353,8 +422,13 @@ export function logout() {
 
 /**
  * 验证当前 token 是否有效
- * 用 POST /model/chat 发一个最小请求，检查返回是否正常（非 401/403）。
- * 验证通过后自动拉取用户信息（nickname/phone/avatarUrl）。
+ *
+ * 与原版一致：用 POST /auth/user-info-by-token 验证（而非 /model/chat）。
+ * 原因：验证码/扫码登录拿到的 token 在 /model/chat 可能返回非标准响应
+ * （如积分不足、模型未授权等业务错误，body 很小但 HTTP 200），
+ * 之前用 /model/chat 验证会把这类业务响应误判为 token 失效 → 立即登出。
+ * /auth/user-info-by-token 只检查 token 本身是否有效，不受模型权限干扰。
+ * 验证通过后自动更新 userInfo（nickname/phone/avatarUrl）。
  */
 export async function verifySession() {
   // 最多两轮：第一轮 token 可能已过期 → 若开启「保持在线」则刷新后重试一轮
@@ -363,49 +437,46 @@ export async function verifySession() {
     if (!state.accessToken) return { valid: false, reason: '无 token' };
     let expired = false;
     try {
-      const resp = await qccRequest(state, '/model/chat', {
+      const resp = await qccRequest(state, '/auth/user-info-by-token', {
         method: 'POST',
-        body: {
-          model: 'qwen3.7-plus',
-          messages: [{ role: 'user', content: '1' }],
-          max_tokens: 1,
-          stream: false,
-        },
       });
-      if (resp && (resp.choices || resp.data || resp.id || (resp.result && resp.result.choices))) {
-        // ✅ Token 有效 — 拉取用户信息
-        try {
-          const userResp = await qccRequest(state, '/auth/user-info-by-token', { method: 'POST' });
-          const userData = userResp.result || userResp.data || userResp;
-          if (userData && (userData.nickname || userData.phone)) {
-            const nextState = {
-              ...state,
-              userInfo: {
-                userId: userData.userId || userData.guid || '',
-                phone: userData.phone || '',
-                nickname: userData.nickname || userData.phone || '用户',
-                avatarUrl: userData.avatarUrl || userData.faceimg || null,
-              },
-            };
-            saveAuthState(nextState);
-            console.log('[QccAuth] 用户信息已获取:', nextState.userInfo.nickname);
-          }
-        } catch (userInfoErr) {
-          console.warn('[QccAuth] 获取用户信息失败（token仍有效）:', userInfoErr.message);
-        }
+
+      // ✅ token 有效：能拿到用户信息（或至少服务端没有报 401/过期）
+      const userData = resp.result || resp.data || resp;
+      if (userData && (userData.userId || userData.guid || userData.nickname || userData.phone)) {
+        // 更新 userInfo
+        const nextState = {
+          ...state,
+          userInfo: {
+            userId: userData.userId || userData.guid || state.userInfo?.userId || '',
+            phone: userData.phone || state.userInfo?.phone || state.phone || '',
+            nickname: userData.nickname || userData.phone || state.userInfo?.nickname || '用户',
+            avatarUrl: userData.avatarUrl || userData.faceimg || state.userInfo?.avatarUrl || null,
+            checkInvite: userData.checkInvite === true,
+          },
+        };
+        saveAuthState(nextState);
+        console.log('[QccAuth] token 有效, 用户:', nextState.userInfo.nickname);
         return { valid: true };
       }
+
+      // 服务端返回了明确的过期/未登录
       if (resp && (resp.code === 401 || resp.code === 40102 || resp.status === 401)) {
         expired = true;
       } else {
-        return { valid: false, reason: '响应格式异常' };
+        // 既没有 userInfo 也不是明确过期——可能是非标准响应格式
+        // 保守处理：不判定为失效（避免误杀有效 token），只记录警告
+        console.warn('[QccAuth] user-info-by-token 响应格式异常，不判定 token 失效:', JSON.stringify(resp).slice(0, 200));
+        return { valid: true };
       }
     } catch (err) {
       const msg = err.message || '';
       if (msg.includes('401') || msg.includes('403') || msg.includes('40102')) {
         expired = true;
       } else {
-        return { valid: false, reason: msg };
+        // 网络错误等——不判定 token 失效
+        console.warn('[QccAuth] 验证请求失败（不判定 token 失效）:', msg);
+        return { valid: true };
       }
     }
     // 本轮判定为过期：开启「保持在线」则刷新后进入下一轮重试

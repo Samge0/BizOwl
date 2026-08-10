@@ -383,6 +383,55 @@
           `;
           dom.authArea.appendChild(creditsCard);
 
+          // 邀请码面板（checkInvite === true 时显示）
+          if (s.userInfo?.checkInvite) {
+            const inviteCard = document.createElement('div');
+            inviteCard.className = 'info-banner';
+            inviteCard.style.cssText = 'display:flex;flex-direction:column;gap:10px;padding:14px 16px;margin-bottom:8px;border:0.5px solid var(--warning);background:rgba(255,149,0,0.06);';
+            const inviteTitle = document.createElement('div');
+            inviteTitle.style.cssText = 'font-size:13px;font-weight:600;color:var(--ink);';
+            inviteTitle.textContent = '🔑 请输入邀请码激活';
+            const inviteDesc = document.createElement('div');
+            inviteDesc.style.cssText = 'font-size:12px;color:var(--ink-muted);line-height:1.5;';
+            inviteDesc.textContent = '当前账号尚未绑定邀请码，积分和对话功能不可用。请输入 8 位邀请码激活试用资格。';
+            const inviteInputRow = document.createElement('div');
+            inviteInputRow.style.cssText = 'display:flex;gap:8px;align-items:center;';
+            const inviteInput = document.createElement('input');
+            inviteInput.type = 'text';
+            inviteInput.placeholder = '8 位邀请码';
+            inviteInput.maxLength = 8;
+            inviteInput.style.cssText = 'flex:1;height:34px;padding:0 10px;border:0.5px solid rgba(0,0,0,0.1);border-radius:8px;font-size:15px;letter-spacing:4px;text-align:center;background:rgba(255,255,255,0.8);';
+            inviteInput.addEventListener('input', () => {
+              const v = inviteInput.value.replace(/[^a-zA-Z0-9]/g, '').toUpperCase().slice(0, 8);
+              if (inviteInput.value !== v) inviteInput.value = v;
+            });
+            const inviteBtn = document.createElement('button');
+            inviteBtn.className = 'btn btn-primary btn-sm';
+            inviteBtn.textContent = '绑定';
+            inviteBtn.style.cssText = 'height:34px;padding:0 16px;flex-shrink:0;';
+            inviteBtn.addEventListener('click', async () => {
+              const code = inviteInput.value.trim();
+              if (code.length !== 8) { showToast('请输入 8 位邀请码', 'error'); return; }
+              try {
+                inviteBtn.disabled = true;
+                inviteBtn.textContent = '绑定中...';
+                const result = await api.authBindInviteCode(code);
+                showToast(result?.message || '邀请码绑定成功', 'success');
+                await loadAuthSession(); // 重新渲染（checkInvite 应变为 false）
+              } catch (err) {
+                showToast('绑定失败: ' + err.message, 'error');
+                inviteBtn.disabled = false;
+                inviteBtn.textContent = '绑定';
+              }
+            });
+            inviteInputRow.appendChild(inviteInput);
+            inviteInputRow.appendChild(inviteBtn);
+            inviteCard.appendChild(inviteTitle);
+            inviteCard.appendChild(inviteDesc);
+            inviteCard.appendChild(inviteInputRow);
+            dom.authArea.appendChild(inviteCard);
+          }
+
           // 异步获取积分
           async function refreshCredits() {
             const balanceEl = document.getElementById('creditsBalance');
@@ -392,11 +441,17 @@
               const info = await api.authGetCreditsInfo();
               if (info && typeof info.balance === 'number') {
                 balanceEl.textContent = info.balance + ' 积分';
-                // 积分为 0 时，额外验证 token 是否真的有效（可能是 token 失效导致积分查询返回 0）
+                // 积分为 0 时：如果 checkInvite 为 true 则是正常的（未绑定邀请码），
+                // 否则验证 token 是否有效（可能 token 失效导致积分查询返回 0）
                 if (info.balance === 0) {
-                  balanceEl.style.color = 'var(--warning)';
-                  balanceEl.textContent = '0 积分';
-                  await checkAndAutoLogout(); // token 失效会自动登出并提示；仍有效则确认是真实 0 分
+                  if (s.userInfo?.checkInvite) {
+                    balanceEl.style.color = 'var(--warning)';
+                    balanceEl.textContent = '0 积分（待激活）';
+                  } else {
+                    balanceEl.style.color = 'var(--warning)';
+                    balanceEl.textContent = '0 积分';
+                    await checkAndAutoLogout();
+                  }
                 } else {
                   balanceEl.style.color = 'var(--ink)';
                 }
@@ -657,8 +712,8 @@
         intlLabel.textContent = '国际区号';
         const intlInput = document.createElement('input');
         intlInput.type = 'text';
-        intlInput.value = '86';
-        intlInput.placeholder = '如 86 (中国大陆)';
+        intlInput.value = '+86';
+        intlInput.placeholder = '如 +86 (中国大陆)';
         intlGroup.appendChild(intlLabel);
         intlGroup.appendChild(intlInput);
         phonePanel.appendChild(intlGroup);
@@ -670,6 +725,12 @@
         const phoneInput = document.createElement('input');
         phoneInput.type = 'tel';
         phoneInput.placeholder = '请输入手机号';
+        phoneInput.maxLength = 11;
+        // 仅允许输入数字（实时过滤非数字字符）
+        phoneInput.addEventListener('input', () => {
+          const digits = phoneInput.value.replace(/\D/g, '').slice(0, 11);
+          if (phoneInput.value !== digits) phoneInput.value = digits;
+        });
         phoneGroup.appendChild(phoneLabel);
         phoneGroup.appendChild(phoneInput);
         phonePanel.appendChild(phoneGroup);
@@ -682,7 +743,26 @@
         const codeSub = document.createElement('div');
         codeSub.style.flex = '1';
         const codeLabel = document.createElement('label');
+        codeLabel.style.display = 'flex';
+        codeLabel.style.alignItems = 'center';
+        codeLabel.style.gap = '4px';
         codeLabel.textContent = '验证码';
+        // 问号提示（自定义 CSS tooltip，hover 立即显示）：验证码可能以彩信发送
+        const codeHint = document.createElement('span');
+        codeHint.textContent = '?';
+        codeHint.style.cssText = 'position:relative;display:inline-flex;align-items:center;justify-content:center;width:15px;height:15px;border-radius:50%;font-size:10px;font-weight:700;color:var(--ink-faint);background:rgba(0,0,0,0.06);cursor:help;flex-shrink:0;';
+        // tooltip 气泡（CSS hover 驱动，无 JS 延迟）
+        const codeTip = document.createElement('span');
+        codeTip.textContent = '验证码可能以彩信（而非普通短信）形式发送。如果未收到，请检查手机的彩信 / 垃圾短信 / 拦截记录，或更换手机号尝试。';
+        codeTip.style.cssText = 'position:absolute;bottom:calc(100% + 8px);left:-4px;width:240px;padding:10px 12px;border-radius:8px;font-size:12px;font-weight:400;line-height:1.5;color:var(--ink);background:rgba(255,255,255,0.95);backdrop-filter:blur(20px) saturate(180%);-webkit-backdrop-filter:blur(20px) saturate(180%);border:0.5px solid rgba(0,0,0,0.1);box-shadow:0 4px 24px rgba(0,0,0,0.12);z-index:10000;opacity:0;visibility:hidden;transition:opacity 0.2s ease,visibility 0.2s ease;pointer-events:none;white-space:normal;text-align:left;';
+        // 小三角箭头（左对齐：箭头靠近问号图标）
+        const codeTipArrow = document.createElement('span');
+        codeTipArrow.style.cssText = 'position:absolute;top:100%;left:10px;width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-top:5px solid rgba(0,0,0,0.1);';
+        codeTip.appendChild(codeTipArrow);
+        codeHint.appendChild(codeTip);
+        codeHint.addEventListener('mouseenter', () => { codeTip.style.opacity = '1'; codeTip.style.visibility = 'visible'; });
+        codeHint.addEventListener('mouseleave', () => { codeTip.style.opacity = '0'; codeTip.style.visibility = 'hidden'; });
+        codeLabel.appendChild(codeHint);
         const codeInput = document.createElement('input');
         codeInput.type = 'text';
         codeInput.placeholder = '验证码';
@@ -772,7 +852,7 @@
 
         sendCodeBtn.addEventListener('click', async () => {
           const phone = phoneInput.value.trim();
-          const intl = intlInput.value.trim() || '86';
+          const intl = intlInput.value.trim() || '+86';
           if (!phone) { showToast('请输入手机号', 'error'); return; }
           try {
             sendCodeBtn.disabled = true;
@@ -792,8 +872,19 @@
             }
 
             sendCodeBtn.textContent = '发送中...';
-            await api.authSendCode(phone, intl, captcha);
-            showToast('验证码已发送', 'success');
+            const resp = await api.authSendCode(phone, intl, captcha);
+            // 检查业务返回（后端可能返回 { success: false, message: '...' }）
+            if (resp && resp.success === false) {
+              throw new Error(resp.message || '发送失败');
+            }
+            // 显示服务端原始响应（诊断用：HTTP 200 不代表短信真正送达）
+            const rawStr = resp?.raw ? JSON.stringify(resp.raw) : '';
+            console.log('[SMS] 服务端原始响应:', rawStr);
+            if (api?.writeLog) {
+              try { await api.writeLog('info', 'SMS', `send-code 原始响应: ${rawStr}`); } catch {}
+            }
+            const displayMsg = resp?.message || '验证码已发送';
+            showToast(displayMsg, 'success', 8000);
             countdown = 60;
             countdownTimer = setInterval(() => {
               if (countdown <= 0) {
@@ -815,7 +906,7 @@
         loginBtn.addEventListener('click', async () => {
           const phone = phoneInput.value.trim();
           const code = codeInput.value.trim();
-          const intl = intlInput.value.trim() || '86';
+          const intl = intlInput.value.trim() || '+86';
           if (!phone) { showToast('请输入手机号', 'error'); return; }
           if (!code) { showToast('请输入验证码', 'error'); return; }
           try {
