@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BizOwl - 你的AI商业助手，优雅且强大</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;600;700&family=Noto+Serif+SC:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #f8f9fa;
+            --bg-secondary: #ffffff;
+            --text-primary: #1a1a1f;
+            --text-secondary: #6e6e73;
+            --accent-blue: #007aff;
+            --accent-blue-hover: #0051d5;
+            --accent-purple: #5856d6;
+            --border-color: rgba(0, 0, 0, 0.1);
+            --glass-bg: rgba(255, 255, 255, 0.8);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', 'Noto Sans SC', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+        
+        .font-serif {
+            font-family: 'Noto Serif SC', Georgia, serif;
+        }
+        
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--border-color);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+        }
+        
+        .hero-gradient {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .text-gradient {
+            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-purple) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .fade-in {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+        }
+        
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .feature-icon {
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-purple) 100%);
+            color: white;
+        }
+        
+        details summary {
+            cursor: pointer;
+            list-style: none;
+            position: relative;
+            padding-right: 32px;
+        }
+        
+        details summary::-webkit-details-marker {
+            display: none;
+        }
+        
+        details summary::after {
+            content: '';
+            position: absolute;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 8px;
+            height: 8px;
+            border-right: 2px solid var(--text-secondary);
+            border-bottom: 2px solid var(--text-secondary);
+            transition: transform 0.2s ease;
+        }
+        
+        details[open] summary::after {
+            transform: translateY(-50%) rotate(45deg);
+        }
+        
+        .step-number {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-purple) 100%);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 18px;
+        }
+        
+        @media (max-width: 768px) {
+            .mobile-hide {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="fixed top-0 left-0 right-0 z-50 glass-card">
+        <div class="max-w-7xl mx-auto px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center space-x-2">
+                    <svg class="w-8 h-8" viewBox="0 0 32 32" fill="none">
+                        <circle cx="16" cy="16" r="14" fill="url(#owl-gradient)"/>
+                        <path d="M12 14c0-1.1.9-2 2-2s2 .9 2 2-.9 2-2 2-2-.9-2-2zm6 0c0-1.1.9-2 2-2s2 .9 2 2-.9 2-2 2-2-.9-2-2z" fill="white"/>
+                        <path d="M16 20c-2.2 0-4 1.8-4 4h8c0-2.2-1.8-4-4-4z" fill="white" opacity="0.8"/>
+                        <defs>
+                            <linearGradient id="owl-gradient" x1="2" y1="2" x2="30" y2="30">
+                                <stop offset="0%" stop-color="#007aff"/>
+                                <stop offset="100%" stop-color="#5856d6"/>
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                    <span class="text-xl font-semibold">BizOwl</span>
+                </div>
+                
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="#features" class="text-gray-600 hover:text-gray-900 transition-colors">功能</a>
+                    <a href="#how-it-works" class="text-gray-600 hover:text-gray-900 transition-colors">快速开始</a>
+                    <a href="#architecture" class="text-gray-600 hover:text-gray-900 transition-colors">架构</a>
+                    <a href="#faq" class="text-gray-600 hover:text-gray-900 transition-colors">FAQ</a>
+                </div>
+                
+                <div class="flex items-center space-x-4">
+                    <a href="https://github.com/Samge0/BizOwl" target="_blank" class="text-gray-600 hover:text-gray-900 transition-colors">
+                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0112 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/>
+                        </svg>
+                    </a>
+                    <a href="https://github.com/Samge0/BizOwl" target="_blank" class="px-4 py-2 rounded-lg text-white font-medium transition-all hover:opacity-90" style="background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-purple) 100%);">
+                        GitHub
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="min-h-screen flex items-center justify-center pt-16 px-6 lg:px-8">
+        <div class="max-w-5xl mx-auto text-center">
+            <div class="inline-flex items-center px-4 py-2 rounded-full glass-card mb-8 text-sm">
+                <span class="w-2 h-2 rounded-full bg-green-500 mr-2"></span>
+                <span>开源免费 · MIT 协议 · 跨平台</span>
+            </div>
+            
+            <h1 class="text-5xl md:text-7xl font-bold mb-6 font-serif">
+                <span class="text-gradient">BizOwl</span>
+            </h1>
+            
+            <p class="text-2xl md:text-3xl font-medium text-gray-700 mb-4">
+                你的AI商业助手，优雅且强大
+            </p>
+            
+            <p class="text-lg text-gray-600 mb-12 max-w-3xl mx-auto leading-relaxed">
+                基于Electron打造的轻量级AI商业助手桌面应用。Apple Design System风格UI，多模型支持，企业工商数据查询，持久记忆，研究报告，技能扩展系统。让商业洞察触手可及。
+            </p>
+            
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
+                <a href="https://github.com/Samge0/BizOwl" target="_blank" class="px-8 py-4 rounded-xl text-white font-semibold text-lg transition-all hover:scale-105 hover:shadow-xl" style="background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-purple) 100%);">
+                    立即开始
+                </a>
+                <a href="#how-it-works" class="px-8 py-4 rounded-xl font-semibold text-lg transition-all border-2 border-gray-300 hover:border-gray-400 hover:bg-gray-50">
+                    了解更多
+                </a>
+            </div>
+            
+            <!-- Hero Visual -->
+            <div class="relative max-w-4xl mx-auto">
+                <div class="glass-card rounded-2xl p-8 fade-in">
+                    <div class="bg-gradient-to-br from-gray-900 to-gray-800 rounded-xl p-6 min-h-[300px] flex items-center justify-center">
+                        <div class="text-center">
+                            <svg class="w-24 h-24 mx-auto mb-4 opacity-50" viewBox="0 0 32 32" fill="none">
+                                <circle cx="16" cy="16" r="14" fill="url(#app-owl)" opacity="0.3"/>
+                                <path d="M12 14c0-1.1.9-2 2-2s2 .9 2 2-.9 2-2 2-2-.9-2-2zm6 0c0-1.1.9-2 2-2s2 .9 2 2-.9 2-2 2-2-.9-2-2z" fill="white" opacity="0.6"/>
+                                <path d="M16 20c-2.2 0-4 1.8-4 4h8c0-2.2-1.8-4-4-4z" fill="white" opacity="0.4"/>
+                                <defs>
+                                    <linearGradient id="app-owl" x1="2" y1="2" x2="30" y2="30">
+                                        <stop offset="0%" stop-color="#007aff"/>
+                                        <stop offset="100%" stop-color="#5856d6"/>
+                                    </linearGradient>
+                                </defs>
+                            </svg>
+                            <p class="text-gray-400">应用界面预览</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Why Choose BizOwl -->
+    <section class="py-24 px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-16 fade-in">
+                <h2 class="text-4xl md:text-5xl font-bold mb-6 font-serif">为什么选择 BizOwl</h2>
+                <p class="text-xl text-gray-600 max-w-2xl mx-auto">
+                    专为商业洞察打造的AI助手，融合Apple设计美学与企业级功能
+                </p>
+            </div>
+            
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="glass-card rounded-2xl p-8 fade-in">
+                    <div class="feature-icon mb-6">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-3">开箱即用的AI对话</h3>
+                    <p class="text-gray-600">流式输出，多会话并行，按时间自动分组的历史记录，全文搜索高亮命中</p>
+                </div>
+                
+                <div class="glass-card rounded-2xl p-8 fade-in">
+                    <div class="feature-icon mb-6">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-3">跨会话持久记忆</h3>
+                    <p class="text-gray-600">Agent自动学习用户偏好与经验，后续对话智能加载，懒加载不占上下文</p>
+                </div>
+                
+                <div class="glass-card rounded-2xl p-8 fade-in">
+                    <div class="feature-icon mb-6">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-3">企业数据实时查询</h3>
+                    <p class="text-gray-600">工商信息、股权穿透、风险排查，接入企查查等实时数据源</p>
+                </div>
+                
+                <div class="glass-card rounded-2xl p-8 fade-in">
+                    <div class="feature-icon mb-6">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-3">Apple Design System</h3>
+                    <p class="text-gray-600">毛玻璃质感贯穿全局，SF Pro字体，发丝分隔线，Action Blue交互色</p>
+                </div>
+                
+                <div class="glass-card rounded-2xl p-8 fade-in">
+                    <div class="feature-icon mb-6">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-3">完全本地部署</h3>
+                    <p class="text-gray-600">凭证仅存储在本地，数据不上传任何第三方服务器，隐私安全有保障</p>
+                </div>
+                
+                <div class="glass-card rounded-2xl p-8 fade-in">
+                    <div class="feature-icon mb-6">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-3">零框架渲染层</h3>
+                    <p class="text-gray-600">原生Vanilla JS + CSS，性能极致，启动飞快</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Core Features -->
+    <section id="features" class="py-24 px-6 lg:px-8 bg-white">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-16 fade-in">
+                <h2 class="text-4xl md:text-5xl font-bold mb-6 font-serif">核心功能</h2>
+                <p class="text-xl text-gray-600 max-w-2xl mx-auto">
+                    从AI对话到企业查询，全方位满足商业洞察需求
+                </p>
+            </div>
+            
+            <div class="space-y-12">
+                <!-- AI Conversation -->
+                <div class="grid lg:grid-cols-2 gap-12 items-center fade-in">
+                    <div>
+                        <div class="inline-flex items-center px-3 py-1 rounded-full bg-blue-50 text-blue-600 text-sm font-medium mb-4">
+                            核心功能
+                        </div>
+                        <h3 class="text-3xl font-bold mb-4 font-serif">AI对话 — 如丝般顺滑</h3>
+                        <p class="text-gray-600 mb-6 leading-relaxed">
+                            实时流式输出，支持中途停止生成。多个对话同时进行，独立状态管理。Markdown表格、代码块、Mermaid流程图、KaTeX数学公式完整渲染。历史记录按时间自动分组，OpenAI风格侧边栏，全文搜索高亮命中片段。
+                        </p>
+                        <ul class="space-y-3">
+                            <li class="flex items-start">
+                                <svg class="w-5 h-5 text-green-500 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                </svg>
+                                <span class="text-gray-700">实时流式输出与停止生成</span>
+                            </li>
+                            <li class="flex items-start">
+                                <svg class="w-5 h-5 text-green-500 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                </svg>
+                                <span class="text-gray-700">多会话并行与独立状态管理</span>
+                            </li>
+                            <li class="flex items-start">
+                                <svg class="w-5 h-5 text-green-500 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                </svg>
+                                <span class="text-gray-700">完整Markdown与图表渲染支持</span>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="glass-card rounded-2xl p-8 min-h-[300px] flex items-center justify-center">
+                        <div class="text-center">
+                            <svg class="w-20 h-20 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+                            </svg>
+                            <p class="text-gray-400">AI对话界面</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Memory System -->
+                <div class="grid lg:grid-cols-2 gap-12 items-center fade-in">
+                    <div class="order-2 lg:order-1 glass-card rounded-2xl p-8 min-h-[300px] flex items-center justify-center">
+                        <div class="text-center">
+                            <svg class="w-20 h-20 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4"/>
+                            </svg>
+                            <p class="text-gray-400">记忆系统界面</p>
+                        </div>
+                    </div>
+                    <div class="order-1 lg:order-2">
+                        <div class="inline-flex items-center px-3 py-1 rounded-full bg-purple-50 text-purple-600 text-sm font-medium mb-4">
+                            智能记忆
+                        </div>
+                        <h3 class="text-3xl font-bold mb-4 font-serif">持久记忆系统 — 越用越懂你</h3>
+                        <p class="text-gray-600 mb-6 leading-relaxed">
+                            Agent自动学习你的偏好、习惯和历史经验。跨会话记忆在后续对话中自动加载，懒加载机制确保不占用上下文窗口。空闲时自动压缩历史记忆块，保持快速召回。设置面板可视化查看、搜索、批量删除记忆条目。
+                        </p>
+                        <ul class="space-y-3">
+                            <li class="flex items-start">
+                                <svg class="w-5 h-5 text-green-500 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                </svg>
+                                <span class="text-gray-700">自动学习用户偏好与经验</span>
+                            </li>
+                            <li class="flex items-start">
+                                <svg class="w-5 h-5 text-green-500 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                </svg>
+                                <span class="text-gray-700">跨会话记忆智能加载</span>
+                            </li>
+                            <li class="flex items-start">
+                                <svg class="w-5 h-5 text-green-500 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                </svg>
+                                <span class="text-gray-700">可视化记忆管理面板</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- Multi-Engine Search -->
+                <div class="grid lg:grid-cols-2 gap-12 items-center fade-in">
+                    <div>
+                        <div class="inline-flex items-center px-3 py-1 rounded-full bg-green-50 text-green-600 text-sm font-medium mb-4">
+                            聚合搜索
+                        </div>
+                        <h3 class="text-3xl font-bold mb-4 font-serif">多引擎聚合搜索 — 信息触达无死角</h3>
+                        <p class="text-gray-600 mb-6 leading-relaxed">
+                            同时查询360、Bing、百度等引擎，合并去重并按相关性评分排序。支持Tavily、Serper.dev、SearXNG外部API并行查询。每条结果附带0-100分相关性评分。随机UA轮换降低限流概率。
+                        </p>
+                        <ul class="space-y-3">
+                            <li class="flex items-start">
+                                <svg class="w-5 h-5 text-green-500 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                </svg>
+                                <span class="text-gray-700">多引擎并行查询</span>
+                            </li>
+                            <li class="flex items-start">
+                                <svg class="w-5 h-5 text-green-500 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                </svg>
+                                <span class="text-gray-700">智能去重与相关性排序</span>
+                            </li>
+                            <li class="flex items-start">
+                                <svg class="w-5 h-5 text-green-500 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                </svg>
+                                <span class="text-gray-700">外部API集成支持</span>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="glass-card rounded-2xl p-8 min-h-[300px] flex items-center justify-center">
+                        <div class="text-center">
+                            <svg class="w-20 h-20 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"/>
+                            </svg>
+                            <p class="text-gray-400">聚合搜索界面</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Research Reports -->
+                <div class="grid lg:grid-cols-2 gap-12 items-center fade-in">
+                    <div class="order-2 lg:order-1 glass-card rounded-2xl p-8 min-h-[300px] flex items-center justify-center">
+                        <div class="text-center">
+                            <svg class="w-20 h-20 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                            </svg>
+                            <p class="text-gray-400">报告生成界面</p>
+                        </div>
+                    </div>
+                    <div class="order-1 lg:order-2">
+                        <div class="inline-flex items-center px-3 py-1 rounded-full bg-orange-50 text-orange-600 text-sm font-medium mb-4">
+                            专业交付
+                        </div>
+                        <h3 class="text-3xl font-bold mb-4 font-serif">研究报告导出 — 专业级成果交付</h3>
+                        <p class="text-gray-600 mb-6 leading-relaxed">
+                            7阶段研究方法论，生成含封面、摘要、目录、正文、评分总表、参考文献的完整报告。支持Markdown、PDF、DOCX、XLSX多格式导出。
+                        </p>
+                        <ul class="space-y-3">
+                            <li class="flex items-start">
+                                <svg class="w-5 h-5 text-green-500 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                </svg>
+                                <span class="text-gray-700">7阶段专业研究方法论</span>
+                            </li>
+                            <li class="flex items-start">
+                                <svg class="w-5 h-5 text-green-500 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                </svg>
+                                <span class="text-gray-700">完整报告结构生成</span>
+                            </li>
+                            <li class="flex items-start">
+                                <svg class="w-5 h-5 text-green-500 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                </svg>
+                                <span class="text-gray-700">多格式导出支持</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- Enterprise Data Query -->
+                <div class="grid lg:grid-cols-2 gap-12 items-center fade-in">
+                    <div>
+                        <div class="inline-flex items-center px-3 py-1 rounded-full bg-red-50 text-red-600 text-sm font-medium mb-4">
+                            企业洞察
+                        </div>
+                        <h3 class="text-3xl font-bold mb-4 font-serif">企业数据查询 — 商业情报一站直达</h3>
+                        <p class="text-gray-600 mb-6 leading-relaxed">
+                            内置企业信息检索、股权穿透、风险排查Agent能力。支持企查查扫码登录、验证码登录、Token输入三种方式。
+                        </p>
+                        <ul class="space-y-3">
+                            <li class="flex items-start">
+                                <svg class="w-5 h-5 text-green-500 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                </svg>
+                                <span class="text-gray-700">企业信息检索能力</span>
+                            </li>
+                            <li class="flex items-start">
+                                <svg class="w-5 h-5 text-green-500 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                </svg>
+                                <span class="text-gray-700">股权穿透与风险排查</span>
+                            </li>
+                            <li class="flex items-start">
+                                <svg class="w-5 h-5 text-green-500 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                </svg>
+                                <span class="text-gray-700">多种登录方式支持</span>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="glass-card rounded-2xl p-8 min-h-[300px] flex items-center justify-center">
+                        <div class="text-center">
+                            <svg class="w-20 h-20 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                            </svg>
+                            <p class="text-gray-400">企业查询界面</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Models & Skills -->
+                <div class="grid lg:grid-cols-2 gap-12 items-center fade-in">
+                    <div class="order-2 lg:order-1 glass-card rounded-2xl p-8 min-h-[300px] flex items-center justify-center">
+                        <div class="text-center">
+                            <svg class="w-20 h-20 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M11 4a2 2 0 114 0v1a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-1a2 2 0 100 4h1a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-1a2 2 0 10-4 0v1a1 1 0 01-1 1H7a1 1 0 01-1-1v-3a1 1 0 00-1-1H4a2 2 0 110-4h1a1 1 0 001-1V7a1 1 0 011-1h3a1 1 0 001-1V4z"/>
+                            </svg>
+                            <p class="text-gray-400">模型与技能配置</p>
+                        </div>
+                    </div>
+                    <div class="order-1 lg:order-2">
+                        <div class="inline-flex items-center px-3 py-1 rounded-full bg-indigo-50 text-indigo-600 text-sm font-medium mb-4">
+                            无限扩展
+                        </div>
+                        <h3 class="text-3xl font-bold mb-4 font-serif">模型与技能 — 无限扩展可能</h3>
+                        <p class="text-gray-600 mb-6 leading-relaxed">
+                            兼容OpenAI API格式的任意模型（vLLM、Ollama、本地部署、云端）。内置文档生成、网页搜索、浏览器自动化技能。MCP市场动态注册第三方工具。
+                        </p>
+                        <ul class="space-y-3">
+                            <li class="flex items-start">
+                                <svg class="w-5 h-5 text-green-500 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                </svg>
+                                <span class="text-gray-700">兼容OpenAI API格式</span>
+                            </li>
+                            <li class="flex items-start">
+                                <svg class="w-5 h-5 text-green-500 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                </svg>
+                                <span class="text-gray-700">内置多种实用技能</span>
+                            </li>
+                            <li class="flex items-start">
+                                <svg class="w-5 h-5 text-green-500 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                </svg>
+                                <span class="text-gray-700">MCP市场动态扩展</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Technical Architecture -->
+    <section id="architecture" class="py-24 px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-16 fade-in">
+                <h2 class="text-4xl md:text-5xl font-bold mb-6 font-serif">技术架构</h2>
+                <p class="text-xl text-gray-600 max-w-2xl mx-auto">
+                    现代化技术栈，确保性能与安全
+                </p>
+            </div>
+            
+            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8 fade-in">
+                <div class="glass-card rounded-2xl p-6 text-center">
+                    <div class="w-16 h-16 mx-auto mb-4 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center">
+                        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                        </svg>
+                    </div>
+                    <h3 class="font-semibold mb-2">桌面框架</h3>
+                    <p class="text-gray-600 text-sm">Electron 43 跨平台桌面应用</p>
+                </div>
+                
+                <div class="glass-card rounded-2xl p-6 text-center">
+                    <div class="w-16 h-16 mx-auto mb-4 rounded-xl bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center">
+                        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01"/>
+                        </svg>
+                    </div>
+                    <h3 class="font-semibold mb-2">主进程</h3>
+                    <p class="text-gray-600 text-sm">Node.js (CJS) IPC通信、文件系统、进程管理</p>
+                </div>
+                
+                <div class="glass-card rounded-2xl p-6 text-center">
+                    <div class="w-16 h-16 mx-auto mb-4 rounded-xl bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center">
+                        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/>
+                        </svg>
+                    </div>
+                    <h3 class="font-semibold mb-2">业务逻辑</h3>
+                    <p class="text-gray-600 text-sm">ES Modules Agent Loop、认证、Prompt Pipeline</p>
+                </div>
+                
+                <div class="glass-card rounded-2xl p-6 text-center">
+                    <div class="w-16 h-16 mx-auto mb-4 rounded-xl bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center">
+                        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+                        </svg>
+                    </div>
+                    <h3 class="font-semibold mb-2">渲染层</h3>
+                    <p class="text-gray-600 text-sm">Vanilla JS + CSS 零框架依赖，原生Web标准</p>
+                </div>
+                
+                <div class="glass-card rounded-2xl p-6 text-center">
+                    <div class="w-16 h-16 mx-auto mb-4 rounded-xl bg-gradient-to-br from-pink-500 to-pink-600 flex items-center justify-center">
+                        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"/>
+                        </svg>
+                    </div>
+                    <h3 class="font-semibold mb-2">设计系统</h3>
+                    <p class="text-gray-600 text-sm">Apple Design Tokens SF Pro、Action Blue、毛玻璃</p>
+                </div>
+                
+                <div class="glass-card rounded-2xl p-6 text-center">
+                    <div class="w-16 h-16 mx-auto mb-4 rounded-xl bg-gradient-to-br from-cyan-500 to-cyan-600 flex items-center justify-center">
+                        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                        </svg>
+                    </div>
+                    <h3 class="font-semibold mb-2">搜索技能</h3>
+                    <p class="text-gray-600 text-sm">Playwright + Crawlee 多搜索引擎 fallback</p>
+                </div>
+                
+                <div class="glass-card rounded-2xl p-6 text-center">
+                    <div class="w-16 h-16 mx-auto mb-4 rounded-xl bg-gradient-to-br from-teal-500 to-teal-600 flex items-center justify-center">
+                        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                        </svg>
+                    </div>
+                    <h3 class="font-semibold mb-2">文档生成</h3>
+                    <p class="text-gray-600 text-sm">python-docx / openpyxl / pptxgenjs 调研报告导出</p>
+                </div>
+                
+                <div class="glass-card rounded-2xl p-6 text-center">
+                    <div class="w-16 h-16 mx-auto mb-4 rounded-xl bg-gradient-to-br from-red-500 to-red-600 flex items-center justify-center">
+                        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/>
+                        </svg>
+                    </div>
+                    <h3 class="font-semibold mb-2">构建</h3>
+                    <p class="text-gray-600 text-sm">electron-builder DMG / NSIS / AppImage</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How to Get Started -->
+    <section id="how-it-works" class="py-24 px-6 lg:px-8 bg-white">
+        <div class="max-w-5xl mx-auto">
+            <div class="text-center mb-16 fade-in">
+                <h2 class="text-4xl md:text-5xl font-bold mb-6 font-serif">三步快速开始</h2>
+                <p class="text-xl text-gray-600 max-w-2xl mx-auto">
+                    简单几步，即刻开启AI商业洞察之旅
+                </p>
+            </div>
+            
+            <div class="space-y-8">
+                <div class="flex gap-8 fade-in">
+                    <div class="flex-shrink-0">
+                        <div class="step-number">1</div>
+                    </div>
+                    <div class="glass-card rounded-2xl p-8 flex-1">
+                        <h3 class="text-2xl font-semibold mb-4">克隆仓库并安装依赖</h3>
+                        <div class="bg-gray-900 rounded-lg p-4 overflow-x-auto">
+                            <code class="text-green-400 text-sm">
+                                git clone https://github.com/Samge0/BizOwl.git<br>
+                                cd BizOwl && npm install
+                            </code>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="flex gap-8 fade-in">
+                    <div class="flex-shrink-0">
+                        <div class="step-number">2</div>
+                    </div>
+                    <div class="glass-card rounded-2xl p-8 flex-1">
+                        <h3 class="text-2xl font-semibold mb-4">启动开发模式</h3>
+                        <div class="bg-gray-900 rounded-lg p-4 overflow-x-auto">
+                            <code class="text-green-400 text-sm">
+                                npm run dev
+                            </code>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="flex gap-8 fade-in">
+                    <div class="flex-shrink-0">
+                        <div class="step-number">3</div>
+                    </div>
+                    <div class="glass-card rounded-2xl p-8 flex-1">
+                        <h3 class="text-2xl font-semibold mb-4">构建生产版本</h3>
+                        <div class="bg-gray-900 rounded-lg p-4 overflow-x-auto">
+                            <code class="text-green-400 text-sm">
+                                npm run build:win (Windows)<br>
+                                npm run build:mac (macOS)<br>
+                                npm run build:linux (Linux)
+                            </code>
+                        </div>
+                        <p class="text-gray-600 mt-4 text-sm">支持 macOS 12+ / Windows 10+ / Linux 全平台</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section id="faq" class="py-24 px-6 lg:px-8">
+        <div class="max-w-3xl mx-auto">
+            <div class="text-center mb-16 fade-in">
+                <h2 class="text-4xl md:text-5xl font-bold mb-6 font-serif">常见问题</h2>
+                <p class="text-xl text-gray-600">
+                    关于BizOwl的疑问解答
+                </p>
+            </div>
+            
+            <div class="space-y-4 fade-in">
+                <details class="glass-card rounded-xl p-6">
+                    <summary class="text-lg font-semibold pr-8">BizOwl是免费的吗？</summary>
+                    <p class="text-gray-600 mt-4 leading-relaxed">
+                        是的，BizOwl完全开源免费，采用MIT协议发布。您可以自由使用、修改和分发。但需要注意，企业数据查询功能需要您自行配置有效的第三方服务凭证（如企查查），这些第三方服务可能需要付费。
+                    </p>
+                </details>
+                
+                <details class="glass-card rounded-xl p-6">
+                    <summary class="text-lg font-semibold pr-8">我的数据安全吗？</summary>
+                    <p class="text-gray-600 mt-4 leading-relaxed">
+                        BizOwl非常重视用户隐私。所有凭证仅存储在本地设备上，不会上传到任何第三方服务器。应用本身不收集或传输用户数据，企业查询功能直接与您配置的数据源通信。
+                    </p>
+                </details>
+                
+                <details class="glass-card rounded-xl p-6">
+                    <summary class="text-lg font-semibold pr-8">支持哪些AI模型？</summary>
+                    <p class="text-gray-600 mt-4 leading-relaxed">
+                        BizOwl兼容所有OpenAI API格式的模型，包括vLLM、Ollama、本地部署的模型以及各类云端API服务。只要遵循OpenAI API标准，即可无缝接入。
+                    </p>
+                </details>
+                
+                <details class="glass-card rounded-xl p-6">
+                    <summary class="text-lg font-semibold pr-8">需要什么系统要求？</summary>
+                    <p class="text-gray-600 mt-4 leading-relaxed">
+                        BizOwl支持macOS 12+、Windows 10+以及主流Linux发行版。建议至少4GB内存，对于AI对话功能，您需要配置相应的API服务或本地模型。
+                    </p>
+                </details>
+                
+                <details class="glass-card rounded-xl p-6">
+                    <summary class="text-lg font-semibold pr-8">如何贡献代码或报告问题？</summary>
+                    <p class="text-gray-600 mt-4 leading-relaxed">
+                        欢迎通过GitHub提交Issue和Pull Request。请在提交前查看项目的贡献指南。对于功能建议和Bug报告，请提供详细的复现步骤和环境信息。
+                    </p>
+                </details>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="py-24 px-6 lg:px-8 bg-white">
+        <div class="max-w-4xl mx-auto text-center fade-in">
+            <h2 class="text-4xl md:text-5xl font-bold mb-6 font-serif">开源 · 自由 · 安全</h2>
+            <p class="text-xl text-gray-600 mb-12 max-w-2xl mx-auto leading-relaxed">
+                BizOwl是一个独立的个人开源项目，采用MIT协议发布。项目本身不包含任何企业数据，数据查询功能依赖用户自行配置有效凭证，所有凭证仅存储在本地，不会上传到任何第三方服务器。
+            </p>
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+                <a href="https://github.com/Samge0/BizOwl" target="_blank" class="px-8 py-4 rounded-xl text-white font-semibold text-lg transition-all hover:scale-105 hover:shadow-xl" style="background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-purple) 100%);">
+                    GitHub 仓库
+                </a>
+                <a href="https://github.com/Samge0/BizOwl" target="_blank" class="px-8 py-4 rounded-xl font-semibold text-lg transition-all border-2 border-gray-300 hover:border-gray-400 hover:bg-gray-50">
+                    Star 支持
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-12 px-6 lg:px-8 border-t border-gray-200">
+        <div class="max-w-7xl mx-auto">
+            <div class="flex flex-col md:flex-row items-center justify-between">
+                <div class="flex items-center space-x-2 mb-4 md:mb-0">
+                    <svg class="w-6 h-6" viewBox="0 0 32 32" fill="none">
+                        <circle cx="16" cy="16" r="14" fill="url(#footer-owl)"/>
+                        <path d="M12 14c0-1.1.9-2 2-2s2 .9 2 2-.9 2-2 2-2-.9-2-2zm6 0c0-1.1.9-2 2-2s2 .9 2 2-.9 2-2 2-2-.9-2-2z" fill="white"/>
+                        <path d="M16 20c-2.2 0-4 1.8-4 4h8c0-2.2-1.8-4-4-4z" fill="white" opacity="0.8"/>
+                        <defs>
+                            <linearGradient id="footer-owl" x1="2" y1="2" x2="30" y2="30">
+                                <stop offset="0%" stop-color="#007aff"/>
+                                <stop offset="100%" stop-color="#5856d6"/>
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                    <span class="font-semibold">BizOwl</span>
+                </div>
+                
+                <div class="text-gray-600 text-sm">
+                    © 2026 Samge0 · MIT License
+                </div>
+                
+                <div class="flex items-center space-x-6 mt-4 md:mt-0">
+                    <a href="https://github.com/Samge0/BizOwl" target="_blank" class="text-gray-600 hover:text-gray-900 transition-colors">
+                        GitHub
+                    </a>
+                    <a href="#" class="text-gray-600 hover:text-gray-900 transition-colors">
+                        文档
+                    </a>
+                    <a href="#" class="text-gray-600 hover:text-gray-900 transition-colors">
+                        支持
+                    </a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Intersection Observer for fade-in animations
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        });
+
+        // Observe all fade-in elements
+        document.querySelectorAll('.fade-in').forEach(el => {
+            observer.observe(el);
+        });
+
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Add shadow to nav on scroll
+        window.addEventListener('scroll', () => {
+            const nav = document.querySelector('nav');
+            if (window.scrollY > 10) {
+                nav.style.boxShadow = '0 4px 20px rgba(0, 0, 0, 0.1)';
+            } else {
+                nav.style.boxShadow = 'none';
+            }
+        });
+    </script>
+</body>
+</html>
