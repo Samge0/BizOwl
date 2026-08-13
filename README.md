@@ -10,6 +10,8 @@ Apple Design System 风格 UI · 多模型支持 · 企业工商数据查询 · 
 [![Electron](https://img.shields.io/badge/Electron-43-47848F.svg)](https://www.electronjs.org/)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 
+**[🌐 在线体验宣传页](https://samge0.github.io/BizOwl/)** · Apple Design System 风格落地页，了解 BizOwl 的全部功能
+
 </div>
 
 
