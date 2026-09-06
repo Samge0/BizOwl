@@ -60,6 +60,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: BizOwl-${{ matrix.platform }}
+          retention-days: 1
           path: |
             dist/*.dmg
             dist/*.zip
