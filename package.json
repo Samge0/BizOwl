@@ -21,7 +21,7 @@
   },
   "dependencies": {
     "js-yaml": "^4.3.0",
-    "zod": "^4.4.3"
+    "zod": "^4.6.6"
   },
   "devDependencies": {
     "electron": "^43.3.0",
